@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Anton, Noto_Sans } from "next/font/google";
+import { Archivo_Black, Noto_Sans } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import { getSession } from "@/lib/session";
 import { SITE_NAME } from "@/lib/constants";
 
-const anton = Anton({
+const archivo = Archivo_Black({
   weight: "400",
   subsets: ["latin"],
-  variable: "--font-anton",
+  variable: "--font-archivo",
   display: "swap",
 });
 
@@ -31,7 +31,7 @@ export default async function RootLayout({
   return (
     <html
       lang="pt-PT"
-      className={`${anton.variable} ${noto.variable} h-full antialiased`}
+      className={`${archivo.variable} ${noto.variable} h-full antialiased`}
     >
       <body className="min-h-dvh flex flex-col font-sans">
         <Nav
@@ -39,10 +39,10 @@ export default async function RootLayout({
             user ? { username: user.username, isAdmin: user.isAdmin } : null
           }
         />
-        <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6">
+        <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6 pb-24 sm:pb-8">
           {children}
         </main>
-        <footer className="text-center text-xs text-muted py-8 px-4">
+        <footer className="text-center text-xs text-muted py-8 px-4 pb-24 sm:pb-8">
           {SITE_NAME} · feito entre amigos ⚽
         </footer>
       </body>

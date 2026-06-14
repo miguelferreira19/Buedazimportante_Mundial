@@ -3,45 +3,41 @@
 @theme {
   /* Fontes (variaveis injetadas pelo next/font no <html>) */
   --font-sans: var(--font-noto), system-ui, sans-serif;
-  --font-display: var(--font-anton), system-ui, sans-serif;
+  --font-display: var(--font-archivo), system-ui, sans-serif;
 
-  /* Paleta festiva inspirada na identidade do Mundial 2026 (multicolor vibrante) */
-  --color-ink: #08081a;
-  --color-ink2: #0e0f26;
-  --color-card: #14152e;
-  --color-card2: #1d1f40;
-  --color-line: #2e3060;
-  --color-fg: #f5f6ff;
-  --color-muted: #9aa0cc;
+  /* Paleta alinhada com o emblema do Mundial 2026: laranja + dourado + branco,
+     sobre fundo escuro, com acentos de cores de bandeiras. */
+  --color-ink: #0b0b15;
+  --color-ink2: #11121f;
+  --color-card: #161826;
+  --color-card2: #1f2236;
+  --color-line: #313550;
+  --color-fg: #f7f8fc;
+  --color-muted: #9aa0bd;
 
-  --color-brand: #ff2e7e; /* rosa/magenta */
-  --color-purple: #9b30e0;
+  --color-brand: #f5901e; /* laranja (cor dominante do logo) */
+  --color-gold: #f2c14e; /* dourado (troféu) */
+  --color-good: #34c97a; /* verde */
+  --color-cyan: #16cde0; /* turquesa */
   --color-blue: #2f6bff;
-  --color-cyan: #16d6c8;
-  --color-orange: #ff7a2f;
-  --color-gold: #ffc83d;
-  --color-good: #28d17c;
+  --color-red: #e5392f;
+  --color-purple: #9b30e0;
 }
 
 :root {
-  /* Gradiente "fita festiva" usado no logo, botoes e destaques */
-  --grad-festive: linear-gradient(
-    100deg,
-    #ff2e7e 0%,
-    #9b30e0 32%,
-    #2f6bff 64%,
-    #16d6c8 100%
-  );
+  /* Gradiente principal quente (laranja -> dourado) para botoes, titulos, acentos */
+  --grad-festive: linear-gradient(100deg, #ff6a1a 0%, #ff961f 48%, #f5c84e 100%);
+  /* Faixa multicolor estilo "bandeiras a irradiar" */
   --grad-festive-wide: linear-gradient(
     90deg,
-    #ff2e7e,
-    #ff7a2f,
-    #ffc83d,
-    #28d17c,
-    #16d6c8,
+    #ff8c1f,
+    #e5392f,
     #2f6bff,
+    #1faa55,
+    #f2c14e,
     #9b30e0,
-    #ff2e7e
+    #16cde0,
+    #ff8c1f
   );
 }
 
@@ -51,10 +47,10 @@ html {
 
 body {
   background:
-    radial-gradient(900px 520px at 88% -8%, rgba(155, 48, 224, 0.22), transparent 60%),
-    radial-gradient(820px 480px at 8% 2%, rgba(255, 46, 126, 0.2), transparent 58%),
-    radial-gradient(700px 520px at 50% 108%, rgba(22, 214, 200, 0.16), transparent 60%),
-    radial-gradient(680px 420px at 110% 60%, rgba(47, 107, 255, 0.14), transparent 60%),
+    radial-gradient(900px 520px at 88% -8%, rgba(245, 144, 30, 0.2), transparent 60%),
+    radial-gradient(820px 480px at 8% 2%, rgba(229, 57, 47, 0.14), transparent 58%),
+    radial-gradient(700px 520px at 50% 108%, rgba(47, 107, 255, 0.12), transparent 60%),
+    radial-gradient(680px 420px at 110% 60%, rgba(242, 193, 78, 0.12), transparent 60%),
     var(--color-ink);
   color: var(--color-fg);
   min-height: 100dvh;
@@ -77,7 +73,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0.01em;
     border-radius: 0.75rem;
     padding: 0.62rem 1.1rem;
@@ -95,13 +91,11 @@ body {
   }
   .btn-primary {
     background: var(--grad-festive);
-    background-size: 160% 160%;
-    color: white;
-    box-shadow: 0 8px 24px -10px rgba(255, 46, 126, 0.6);
+    color: #2a1500;
+    box-shadow: 0 8px 24px -10px rgba(245, 144, 30, 0.65);
   }
   .btn-primary:hover:not(:disabled) {
-    filter: brightness(1.08) saturate(1.1);
-    box-shadow: 0 10px 28px -8px rgba(155, 48, 224, 0.65);
+    filter: brightness(1.07) saturate(1.06);
   }
   .btn-ghost {
     background: var(--color-card2);
@@ -129,7 +123,7 @@ body {
     width: 3rem;
     text-align: center;
     font-family: var(--font-display);
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     background: var(--color-ink2);
     border: 1px solid var(--color-line);
     border-radius: 0.6rem;
@@ -145,7 +139,7 @@ body {
     margin: 0;
   }
   .score-input:focus {
-    outline: 2px solid color-mix(in srgb, var(--color-cyan) 75%, transparent);
+    outline: 2px solid color-mix(in srgb, var(--color-brand) 75%, transparent);
     border-color: transparent;
   }
 
@@ -163,22 +157,22 @@ body {
   }
 }
 
-/* Texto com o gradiente festivo */
+/* Texto com o gradiente quente */
 .brand-text {
   font-family: var(--font-display);
   background: var(--grad-festive);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  letter-spacing: 0.015em;
+  letter-spacing: 0.005em;
 }
 
 .display {
   font-family: var(--font-display);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.005em;
 }
 
-/* Barra fina multicolor no topo da pagina */
+/* Barra fina multicolor no topo */
 .festive-bar {
   height: 4px;
   width: 100%;
@@ -192,26 +186,38 @@ body {
   }
 }
 
-/* Emblema "26" + trofeu */
-.emblem {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 0.78;
+/* Emblema: badge laranja + riscas de bandeiras + troféu */
+.emblem-badge {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 24%;
+  background: linear-gradient(135deg, #ff9a2e, #ef7d10);
+  overflow: hidden;
+  box-shadow: 0 6px 18px -8px rgba(239, 125, 16, 0.7);
+  flex: none;
 }
-.emblem.inline {
-  flex-direction: row;
-  align-items: center;
-  gap: 0.28em;
-  line-height: 1;
+.emblem-badge .stripes {
+  position: absolute;
+  inset: -30%;
+  background: repeating-linear-gradient(
+    58deg,
+    transparent 0 10px,
+    rgba(229, 57, 47, 0.55) 10px 14px,
+    transparent 14px 24px,
+    rgba(47, 107, 255, 0.5) 24px 28px,
+    transparent 28px 40px,
+    rgba(31, 170, 85, 0.5) 40px 44px,
+    transparent 44px 56px,
+    rgba(255, 255, 255, 0.5) 56px 60px,
+    transparent 60px 72px,
+    rgba(0, 0, 0, 0.3) 72px 76px,
+    transparent 76px 88px
+  );
+  opacity: 0.55;
 }
-.emblem-26 {
-  font-family: var(--font-display);
-  background: var(--grad-festive);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  letter-spacing: -0.02em;
+.emblem-badge svg {
+  position: relative;
 }
 
 /* Realce subtil em titulos de seccao */

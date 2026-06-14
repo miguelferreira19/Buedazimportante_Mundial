@@ -1,16 +1,23 @@
-// Motor de pontuacao — "Detalhado por niveis".
+// Motor de pontuacao.
 // Ficheiro PURO (sem dependencias de servidor) para poder ser testado isoladamente.
+//
+// Regras:
+//   6 -> resultado exato (placar certo nas duas equipas)
+//   4 -> acertou o vencedor/empate E os golos de UMA das equipas
+//   3 -> acertou so o vencedor/empate
+//   0 -> falhado
+// (Avalia-se do criterio mais especifico para o menos.)
 
 export const SCORING = {
-  exact: 5, // resultado exato (placar certo)
-  goalDiff: 3, // diferenca de golos certa (mas placar errado)
-  outcome: 2, // vencedor/empate certo (mas diferenca errada)
+  exact: 6,
+  oneTeam: 4,
+  outcome: 3,
   miss: 0,
 } as const;
 
 export type Scoreline = { home: number; away: number };
 
-export type ScoreTier = "exact" | "goalDiff" | "outcome" | "miss";
+export type ScoreTier = "exact" | "oneTeam" | "outcome" | "miss";
 
 export function resultOf(s: Scoreline): "H" | "D" | "A" {
   if (s.home > s.away) return "H";
@@ -18,15 +25,16 @@ export function resultOf(s: Scoreline): "H" | "D" | "A" {
   return "D";
 }
 
-/**
- * Classifica um palpite face ao resultado real, do criterio mais especifico
- * para o menos especifico. Cada jogo vale no maximo SCORING.exact pontos.
- */
 export function scoreTier(pred: Scoreline, actual: Scoreline): ScoreTier {
-  if (pred.home === actual.home && pred.away === actual.away) return "exact";
-  if (pred.home - pred.away === actual.home - actual.away) return "goalDiff";
-  if (resultOf(pred) === resultOf(actual)) return "outcome";
-  return "miss";
+  const exact = pred.home === actual.home && pred.away === actual.away;
+  if (exact) return "exact";
+
+  // Sem acertar o vencedor/empate nao ha pontos.
+  if (resultOf(pred) !== resultOf(actual)) return "miss";
+
+  // Acertou o vencedor/empate; ve se acertou os golos de uma das equipas.
+  const oneTeam = pred.home === actual.home || pred.away === actual.away;
+  return oneTeam ? "oneTeam" : "outcome";
 }
 
 export function scorePrediction(pred: Scoreline, actual: Scoreline): number {

@@ -92,9 +92,13 @@ export type HistoryRow = {
   match: DbMatch;
 };
 
-// Historico de palpites de um utilizador, apenas para jogos que JA comecaram
-// (para nao revelar palpites de jogos futuros de outras pessoas).
-export async function getUserHistory(userId: string): Promise<HistoryRow[]> {
+// Historico de palpites de um utilizador.
+// onlyFinished=true mostra apenas jogos TERMINADOS (para ver palpites de outras
+// pessoas sem enviesar). onlyFinished=false mostra jogos que ja comecaram (perfil proprio).
+export async function getUserHistory(
+  userId: string,
+  onlyFinished = false,
+): Promise<HistoryRow[]> {
   const db = getDb();
   const { data } = await db
     .from("predictions")
@@ -103,12 +107,60 @@ export async function getUserHistory(userId: string): Promise<HistoryRow[]> {
 
   const nowMs = Date.now();
   const rows = ((data ?? []) as unknown as HistoryRow[])
-    .filter(
-      (r) => r.match && new Date(r.match.kickoff_utc).getTime() <= nowMs,
-    )
-    .sort((a, b) =>
-      a.match.kickoff_utc < b.match.kickoff_utc ? 1 : -1,
-    );
+    .filter((r) => {
+      if (!r.match) return false;
+      return onlyFinished
+        ? r.match.status === "finished"
+        : new Date(r.match.kickoff_utc).getTime() <= nowMs;
+    })
+    .sort((a, b) => (a.match.kickoff_utc < b.match.kickoff_utc ? 1 : -1));
+  return rows;
+}
+
+export async function getMatchById(id: number): Promise<DbMatch | null> {
+  const db = getDb();
+  const { data } = await db
+    .from("matches")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  return (data as DbMatch) ?? null;
+}
+
+export type MatchVote = {
+  username: string;
+  pred_home: number;
+  pred_away: number;
+  points: number | null;
+};
+
+// Palpites de TODA a gente para um jogo (usar so depois do jogo terminar).
+export async function getMatchPredictions(
+  matchId: number,
+): Promise<MatchVote[]> {
+  const db = getDb();
+  const { data } = await db
+    .from("predictions")
+    .select("pred_home, pred_away, points, user:users(username)")
+    .eq("match_id", matchId);
+
+  const rows: MatchVote[] = ((data ?? []) as unknown as {
+    pred_home: number;
+    pred_away: number;
+    points: number | null;
+    user: { username: string } | null;
+  }[]).map((r) => ({
+    username: r.user?.username ?? "?",
+    pred_home: r.pred_home,
+    pred_away: r.pred_away,
+    points: r.points,
+  }));
+
+  rows.sort(
+    (a, b) =>
+      (b.points ?? 0) - (a.points ?? 0) ||
+      a.username.localeCompare(b.username, "pt"),
+  );
   return rows;
 }
 

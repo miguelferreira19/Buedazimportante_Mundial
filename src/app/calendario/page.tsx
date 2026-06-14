@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { isDbConfigured } from "@/lib/db";
 import { getAllMatches } from "@/lib/queries";
@@ -20,6 +21,14 @@ export default async function CalendarioPage() {
     const k = dayKey(m.kickoff_utc);
     if (!map.has(k)) map.set(k, []);
     map.get(k)!.push(m);
+  }
+  // ordena os jogos por hora dentro de cada dia
+  for (const [, list] of map) {
+    list.sort(
+      (a, b) =>
+        new Date(a.kickoff_utc).getTime() - new Date(b.kickoff_utc).getTime() ||
+        a.id - b.id,
+    );
   }
   const days = [...map.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1));
 
@@ -45,7 +54,13 @@ export default async function CalendarioPage() {
             </h2>
             <div className="space-y-2">
               {list.map((m) => (
-                <MatchRow key={m.id} m={m} />
+                <Link
+                  key={m.id}
+                  href={`/jogo/${m.id}`}
+                  className="block transition-opacity hover:opacity-90"
+                >
+                  <MatchRow m={m} />
+                </Link>
               ))}
             </div>
           </section>

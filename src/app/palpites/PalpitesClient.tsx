@@ -3,24 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import type { DbMatch } from "@/lib/types";
 import { dayKey, fmtDayLabel, fmtTime, countdown, hasStarted } from "@/lib/format";
+import Link from "next/link";
 import { scoreTier, SCORING, type ScoreTier } from "@/lib/scoring";
+import { TIER_LABEL, TIER_CLASS } from "@/lib/tiers";
 import Crest from "@/components/Crest";
 
 type PredInput = { home: string; away: string };
 type SaveState = "idle" | "saving" | "saved" | "error";
-
-const TIER_LABEL: Record<ScoreTier, string> = {
-  exact: "Exato!",
-  goalDiff: "Diferença certa",
-  outcome: "Vencedor certo",
-  miss: "Falhado",
-};
-const TIER_CLASS: Record<ScoreTier, string> = {
-  exact: "text-good",
-  goalDiff: "text-cyan",
-  outcome: "text-gold",
-  miss: "text-muted",
-};
 
 export default function PalpitesClient({
   matches,
@@ -60,12 +49,10 @@ export default function PalpitesClient({
     }
     const arr = [...map.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1));
     for (const [, list] of arr) {
-      list.sort((a, b) =>
-        a.kickoff_utc < b.kickoff_utc
-          ? -1
-          : a.kickoff_utc > b.kickoff_utc
-            ? 1
-            : a.id - b.id,
+      list.sort(
+        (a, b) =>
+          new Date(a.kickoff_utc).getTime() -
+            new Date(b.kickoff_utc).getTime() || a.id - b.id,
       );
     }
     return arr;
@@ -274,19 +261,29 @@ export default function PalpitesClient({
                         </button>
                       </>
                     ) : (
-                      <div className="flex items-center justify-between w-full text-sm">
-                        <span className="text-muted">
+                      <div className="flex items-center justify-between w-full text-sm gap-2">
+                        <span className="text-muted truncate">
                           {sv
                             ? `O teu palpite: ${sv.home}×${sv.away}`
                             : teamsKnown
                               ? "Sem palpite"
                               : "Equipas por definir"}
                         </span>
-                        {tier && (
-                          <span className={`display ${TIER_CLASS[tier]}`}>
-                            +{SCORING[tier]} · {TIER_LABEL[tier]}
-                          </span>
-                        )}
+                        <div className="flex items-center gap-3 shrink-0">
+                          {tier && (
+                            <span className={`display ${TIER_CLASS[tier]}`}>
+                              +{SCORING[tier]} · {TIER_LABEL[tier]}
+                            </span>
+                          )}
+                          {finished && (
+                            <Link
+                              href={`/jogo/${m.id}`}
+                              className="text-brand hover:underline whitespace-nowrap"
+                            >
+                              ver todos →
+                            </Link>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>

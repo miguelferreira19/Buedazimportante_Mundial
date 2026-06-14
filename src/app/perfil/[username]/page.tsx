@@ -6,21 +6,9 @@ import SetupNotice from "@/components/SetupNotice";
 import Crest from "@/components/Crest";
 import { fmtKickoff } from "@/lib/format";
 import { scoreTier, SCORING, type ScoreTier } from "@/lib/scoring";
+import { TIER_LABEL, TIER_CLASS } from "@/lib/tiers";
 
 export const dynamic = "force-dynamic";
-
-const TIER_LABEL: Record<ScoreTier, string> = {
-  exact: "Exato",
-  goalDiff: "Dif. certa",
-  outcome: "Vencedor",
-  miss: "Falhado",
-};
-const TIER_CLASS: Record<ScoreTier, string> = {
-  exact: "text-good",
-  goalDiff: "text-cyan",
-  outcome: "text-gold",
-  miss: "text-muted",
-};
 
 export default async function PerfilPage({
   params,
@@ -41,7 +29,8 @@ export default async function PerfilPage({
     );
   }
 
-  const rows = await getUserHistory(target.id);
+  const isOwn = target.id === session.uid;
+  const rows = await getUserHistory(target.id, !isOwn);
   const totalPts = rows.reduce((s, r) => s + (r.points ?? 0), 0);
   const exatos = rows.filter((r) => r.points === SCORING.exact).length;
   const jogados = rows.filter((r) => r.points != null).length;
@@ -64,6 +53,11 @@ export default async function PerfilPage({
             <span className="text-muted">jogos</span>
           </span>
         </div>
+        {!isOwn && (
+          <p className="text-xs text-muted mt-2">
+            A ver apenas jogos já terminados.
+          </p>
+        )}
       </div>
 
       {rows.length === 0 ? (

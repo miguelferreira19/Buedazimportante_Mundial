@@ -26,7 +26,7 @@ export default async function CalendarioPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="display text-3xl">Calendário</h1>
+        <h1 className="display text-3xl section-accent">Calendário</h1>
         <p className="text-muted text-sm mt-1">
           Todos os jogos do Mundial e os resultados.
         </p>

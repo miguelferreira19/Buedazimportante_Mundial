@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { SITE_NAME } from "@/lib/constants";
+import Emblem from "@/components/Emblem";
 
 type NavUser = { username: string; isAdmin: boolean } | null;
 
@@ -27,10 +28,17 @@ export default function Nav({ user }: { user: NavUser }) {
   }
 
   return (
-    <header className="sticky top-0 z-20 border-b border-line bg-ink/80 backdrop-blur">
-      <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
-        <Link href={user ? "/palpites" : "/login"} className="shrink-0">
-          <span className="brand-text text-xl sm:text-2xl">{SITE_NAME}</span>
+    <header className="sticky top-0 z-20 border-b border-line bg-ink/85 backdrop-blur">
+      <div className="festive-bar" />
+      <div className="max-w-3xl mx-auto px-4 py-2.5 flex items-center gap-3">
+        <Link
+          href={user ? "/palpites" : "/login"}
+          className="shrink-0 flex items-center gap-2"
+        >
+          <Emblem size={22} layout="inline" />
+          <span className="display text-fg text-base sm:text-lg leading-none max-w-[40vw] sm:max-w-none truncate">
+            {SITE_NAME}
+          </span>
         </Link>
 
         {user && (
@@ -42,9 +50,7 @@ export default function Nav({ user }: { user: NavUser }) {
                   key={l.href}
                   href={l.href}
                   className={`px-2.5 py-1.5 rounded-lg text-sm whitespace-nowrap transition-colors ${
-                    active
-                      ? "bg-card2 text-fg"
-                      : "text-muted hover:text-fg"
+                    active ? "bg-card2 text-fg" : "text-muted hover:text-fg"
                   }`}
                 >
                   {l.label}

@@ -134,7 +134,7 @@ export default function AdminClient({
 
   return (
     <div className="space-y-8">
-      <h1 className="display text-3xl">Administração</h1>
+      <h1 className="display text-3xl section-accent">Administração</h1>
 
       {/* Sincronizacao */}
       <section className="card p-5 space-y-3">

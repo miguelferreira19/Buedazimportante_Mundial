@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SITE_NAME } from "@/lib/constants";
 import ScoringLegend from "@/components/ScoringLegend";
+import Emblem from "@/components/Emblem";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -41,10 +42,11 @@ export default function LoginForm() {
 
   return (
     <div className="max-w-sm mx-auto space-y-6 pt-6">
-      <div className="text-center space-y-1">
-        <h1 className="brand-text text-4xl">{SITE_NAME}</h1>
-        <p className="text-muted text-sm">
-          Faz os teus palpites, soma pontos, ganha o bolão.
+      <div className="flex flex-col items-center text-center gap-3 pt-2">
+        <Emblem size={84} />
+        <h1 className="brand-text text-3xl leading-tight">{SITE_NAME}</h1>
+        <p className="text-muted text-sm max-w-xs">
+          Faz os teus palpites, soma pontos e ganha o bolão do Mundial 2026. ⚽
         </p>
       </div>
 

@@ -1,0 +1,301 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import type { DbMatch } from "@/lib/types";
+import { dayKey, fmtDayLabel, fmtTime, countdown, hasStarted } from "@/lib/format";
+import { scoreTier, SCORING, type ScoreTier } from "@/lib/scoring";
+import Crest from "@/components/Crest";
+
+type PredInput = { home: string; away: string };
+type SaveState = "idle" | "saving" | "saved" | "error";
+
+const TIER_LABEL: Record<ScoreTier, string> = {
+  exact: "Exato!",
+  goalDiff: "Diferença certa",
+  outcome: "Vencedor certo",
+  miss: "Falhado",
+};
+const TIER_CLASS: Record<ScoreTier, string> = {
+  exact: "text-good",
+  goalDiff: "text-cyan",
+  outcome: "text-gold",
+  miss: "text-muted",
+};
+
+export default function PalpitesClient({
+  matches,
+  initialPreds,
+}: {
+  matches: DbMatch[];
+  initialPreds: Record<number, { home: number; away: number }>;
+}) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(t);
+  }, []);
+
+  const toInput = (): Record<number, PredInput> => {
+    const o: Record<number, PredInput> = {};
+    for (const [k, v] of Object.entries(initialPreds)) {
+      o[Number(k)] = { home: String(v.home), away: String(v.away) };
+    }
+    return o;
+  };
+
+  const [preds, setPreds] = useState<Record<number, PredInput>>(toInput);
+  const [saved, setSaved] = useState<Record<number, PredInput>>(toInput);
+  const [state, setState] = useState<Record<number, SaveState>>({});
+  const [errs, setErrs] = useState<Record<number, string>>({});
+  const [showPast, setShowPast] = useState(false);
+
+  const todayKey = dayKey(new Date(now).toISOString());
+
+  const days = useMemo(() => {
+    const map = new Map<string, DbMatch[]>();
+    for (const m of matches) {
+      const k = dayKey(m.kickoff_utc);
+      if (!map.has(k)) map.set(k, []);
+      map.get(k)!.push(m);
+    }
+    const arr = [...map.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1));
+    for (const [, list] of arr) {
+      list.sort((a, b) =>
+        a.kickoff_utc < b.kickoff_utc
+          ? -1
+          : a.kickoff_utc > b.kickoff_utc
+            ? 1
+            : a.id - b.id,
+      );
+    }
+    return arr;
+  }, [matches]);
+
+  const visibleDays = days.filter(([k]) => showPast || k >= todayKey);
+
+  function setField(id: number, side: "home" | "away", val: string) {
+    const v = val.replace(/[^0-9]/g, "").slice(0, 2);
+    setPreds((p) => ({
+      ...p,
+      [id]: { ...(p[id] ?? { home: "", away: "" }), [side]: v },
+    }));
+    setState((s) => ({ ...s, [id]: "idle" }));
+  }
+
+  function isDirty(id: number) {
+    const p = preds[id];
+    if (!p || (p.home === "" && p.away === "")) return false;
+    const s = saved[id];
+    if (!s) return true;
+    return p.home !== s.home || p.away !== s.away;
+  }
+
+  async function save(id: number) {
+    const p = preds[id];
+    if (!p || p.home === "" || p.away === "") {
+      setErrs((e) => ({ ...e, [id]: "Preenche os dois resultados." }));
+      setState((s) => ({ ...s, [id]: "error" }));
+      return;
+    }
+    setState((s) => ({ ...s, [id]: "saving" }));
+    setErrs((e) => ({ ...e, [id]: "" }));
+    try {
+      const res = await fetch("/api/predictions", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          matchId: id,
+          home: Number(p.home),
+          away: Number(p.away),
+        }),
+      });
+      const j = await res.json();
+      if (j.ok) {
+        setSaved((sv) => ({ ...sv, [id]: { home: p.home, away: p.away } }));
+        setState((s) => ({ ...s, [id]: "saved" }));
+      } else {
+        setErrs((e) => ({ ...e, [id]: j.error || "Erro ao guardar." }));
+        setState((s) => ({ ...s, [id]: "error" }));
+      }
+    } catch {
+      setErrs((e) => ({ ...e, [id]: "Sem ligação ao servidor." }));
+      setState((s) => ({ ...s, [id]: "error" }));
+    }
+  }
+
+  if (matches.length === 0) {
+    return (
+      <div className="card p-6 text-sm text-muted">
+        Ainda não há jogos carregados. O administrador precisa de sincronizar o
+        calendário no painel de Admin.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <label className="flex items-center gap-2 text-sm text-muted">
+        <input
+          type="checkbox"
+          checked={showPast}
+          onChange={(e) => setShowPast(e.target.checked)}
+        />
+        Mostrar também os jogos já passados
+      </label>
+
+      {visibleDays.length === 0 && (
+        <div className="card p-6 text-sm text-muted">
+          Não há jogos próximos. Ativa “mostrar jogos passados” para rever os
+          anteriores.
+        </div>
+      )}
+
+      {visibleDays.map(([k, list]) => (
+        <section key={k} className="space-y-2">
+          <h2
+            className={`display text-lg sticky top-[57px] py-1 bg-ink/80 backdrop-blur ${
+              k === todayKey ? "text-brand" : "text-fg"
+            }`}
+          >
+            {fmtDayLabel(list[0].kickoff_utc)}
+            {k === todayKey && (
+              <span className="chip ml-2 align-middle">Hoje</span>
+            )}
+          </h2>
+
+          <div className="space-y-2">
+            {list.map((m) => {
+              const started = hasStarted(m.kickoff_utc, now);
+              const finished = m.status === "finished";
+              const teamsKnown = Boolean(m.home_name && m.away_name);
+              const p = preds[m.id];
+              const sv = saved[m.id];
+              const st = state[m.id] ?? "idle";
+
+              let tier: ScoreTier | null = null;
+              if (finished && sv && m.home_score != null && m.away_score != null) {
+                tier = scoreTier(
+                  { home: Number(sv.home), away: Number(sv.away) },
+                  { home: m.home_score, away: m.away_score },
+                );
+              }
+
+              return (
+                <div key={m.id} className="card p-3">
+                  <div className="flex items-center justify-between text-xs text-muted mb-2">
+                    <span className="truncate">
+                      {m.grp ?? m.stage ?? ""}
+                      {m.matchday && m.grp ? ` · J${m.matchday}` : ""}
+                    </span>
+                    <span className="flex items-center gap-2 shrink-0">
+                      {m.status === "live" && (
+                        <span className="chip text-brand border-brand/40">
+                          ● a decorrer
+                        </span>
+                      )}
+                      <span>{fmtTime(m.kickoff_utc)}</span>
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                    {/* Casa */}
+                    <div className="flex items-center gap-2 min-w-0 justify-end text-right">
+                      <span className="truncate font-semibold">
+                        {m.home_name ?? "A definir"}
+                      </span>
+                      <Crest src={m.home_crest} alt={m.home_name ?? ""} />
+                    </div>
+
+                    {/* Centro: inputs ou resultado */}
+                    <div className="flex items-center gap-1.5 justify-center">
+                      {!started && teamsKnown ? (
+                        <>
+                          <input
+                            className="score-input"
+                            inputMode="numeric"
+                            value={p?.home ?? ""}
+                            onChange={(e) =>
+                              setField(m.id, "home", e.target.value)
+                            }
+                            aria-label={`Golos ${m.home_name}`}
+                          />
+                          <span className="text-muted">×</span>
+                          <input
+                            className="score-input"
+                            inputMode="numeric"
+                            value={p?.away ?? ""}
+                            onChange={(e) =>
+                              setField(m.id, "away", e.target.value)
+                            }
+                            aria-label={`Golos ${m.away_name}`}
+                          />
+                        </>
+                      ) : (
+                        <div className="display text-2xl px-2">
+                          {finished
+                            ? `${m.home_score} × ${m.away_score}`
+                            : "🔒"}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Fora */}
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Crest src={m.away_crest} alt={m.away_name ?? ""} />
+                      <span className="truncate font-semibold">
+                        {m.away_name ?? "A definir"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Rodapé: guardar OU palpite/resultado */}
+                  <div className="mt-2 flex items-center justify-between gap-2 min-h-[2rem]">
+                    {!started && teamsKnown ? (
+                      <>
+                        <span className="text-xs text-muted">
+                          {countdown(m.kickoff_utc, now)}
+                          {st === "saved" && !isDirty(m.id) && (
+                            <span className="text-good ml-2">✓ guardado</span>
+                          )}
+                          {errs[m.id] && (
+                            <span className="text-brand ml-2">{errs[m.id]}</span>
+                          )}
+                        </span>
+                        <button
+                          className="btn btn-primary text-sm py-1.5 px-3"
+                          disabled={st === "saving" || !isDirty(m.id)}
+                          onClick={() => save(m.id)}
+                        >
+                          {st === "saving"
+                            ? "A guardar…"
+                            : isDirty(m.id)
+                              ? "Guardar"
+                              : "Guardado"}
+                        </button>
+                      </>
+                    ) : (
+                      <div className="flex items-center justify-between w-full text-sm">
+                        <span className="text-muted">
+                          {sv
+                            ? `O teu palpite: ${sv.home}×${sv.away}`
+                            : teamsKnown
+                              ? "Sem palpite"
+                              : "Equipas por definir"}
+                        </span>
+                        {tier && (
+                          <span className={`display ${TIER_CLASS[tier]}`}>
+                            +{SCORING[tier]} · {TIER_LABEL[tier]}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}

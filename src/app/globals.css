@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+@theme {
+  /* Fontes (as variaveis sao injetadas pelo next/font no <html>) */
+  --font-sans: var(--font-noto), system-ui, sans-serif;
+  --font-display: var(--font-anton), system-ui, sans-serif;
+
+  /* Paleta inspirada na identidade vibrante do Mundial 2026 */
+  --color-ink: #0b1020;
+  --color-card: #141a2e;
+  --color-card2: #1b2340;
+  --color-line: #2a3354;
+  --color-fg: #f6f8ff;
+  --color-muted: #9aa6c4;
+  --color-brand: #ff2d78; /* rosa/magenta */
+  --color-violet: #7c3aed;
+  --color-cyan: #22d3ee;
+  --color-good: #34d399; /* acertou */
+  --color-gold: #fbbf24; /* destaque/lideranca */
+}
+
+html {
+  background: var(--color-ink);
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 100% -10%, rgba(124, 58, 237, 0.18), transparent 60%),
+    radial-gradient(1000px 500px at -10% 0%, rgba(255, 45, 120, 0.16), transparent 55%),
+    var(--color-ink);
+  color: var(--color-fg);
+  min-height: 100dvh;
+}
+
+@layer components {
+  .card {
+    background: color-mix(in srgb, var(--color-card) 92%, transparent);
+    border: 1px solid var(--color-line);
+    border-radius: 1rem;
+    backdrop-filter: blur(6px);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    border-radius: 0.7rem;
+    padding: 0.6rem 1.05rem;
+    cursor: pointer;
+    transition: transform 0.05s ease, filter 0.15s ease, opacity 0.15s ease;
+    border: 1px solid transparent;
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: linear-gradient(100deg, var(--color-brand), var(--color-violet));
+    color: white;
+  }
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+  .btn-ghost {
+    background: var(--color-card2);
+    color: var(--color-fg);
+    border-color: var(--color-line);
+  }
+  .btn-ghost:hover:not(:disabled) {
+    border-color: var(--color-brand);
+  }
+
+  .input {
+    background: var(--color-ink);
+    border: 1px solid var(--color-line);
+    border-radius: 0.6rem;
+    color: var(--color-fg);
+    padding: 0.55rem 0.7rem;
+    width: 100%;
+  }
+  .input:focus {
+    outline: 2px solid color-mix(in srgb, var(--color-brand) 70%, transparent);
+    outline-offset: 1px;
+  }
+
+  .score-input {
+    width: 3rem;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    background: var(--color-ink);
+    border: 1px solid var(--color-line);
+    border-radius: 0.55rem;
+    color: var(--color-fg);
+    padding: 0.25rem 0;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  .score-input::-webkit-outer-spin-button,
+  .score-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .score-input:focus {
+    outline: 2px solid color-mix(in srgb, var(--color-cyan) 70%, transparent);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.12rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    color: var(--color-muted);
+  }
+}
+
+.brand-text {
+  font-family: var(--font-display);
+  background: linear-gradient(95deg, var(--color-brand), var(--color-cyan));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 0.02em;
+}
+
+.display {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+}

@@ -1,0 +1,22 @@
+name: Sincronizar resultados
+
+# Chama o endpoint de sincronizacao do site de X em X minutos para ir buscar
+# os resultados a football-data.org e recalcular os pontos.
+#
+# Precisa de 2 "secrets" no repositorio (Settings -> Secrets and variables -> Actions):
+#   SITE_URL    -> o endereco do teu site na Vercel (ex.: https://o-meu-bolao.vercel.app)
+#   CRON_SECRET -> exatamente o mesmo valor que puseste na variavel CRON_SECRET da Vercel
+
+on:
+  schedule:
+    - cron: "*/15 * * * *" # a cada 15 minutos
+  workflow_dispatch: {} # permite correr a mao no separador "Actions"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Chamar /api/cron/sync
+        run: |
+          curl -fsS "${{ secrets.SITE_URL }}/api/cron/sync" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}"

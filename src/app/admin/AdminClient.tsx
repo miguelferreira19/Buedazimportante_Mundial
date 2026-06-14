@@ -21,6 +21,27 @@ export default function AdminClient({
   // --- Sincronizacao ---
   const [syncing, setSyncing] = useState(false);
   const [syncMsg, setSyncMsg] = useState<string | null>(null);
+  const [recomputing, setRecomputing] = useState(false);
+  const [recomputeMsg, setRecomputeMsg] = useState<string | null>(null);
+
+  async function doRecompute() {
+    setRecomputing(true);
+    setRecomputeMsg(null);
+    try {
+      const res = await fetch("/api/admin/recompute", { method: "POST" });
+      const j = await res.json();
+      if (j.ok) {
+        setRecomputeMsg(`Pontos recalculados (${j.recomputed} palpites).`);
+        router.refresh();
+      } else {
+        setRecomputeMsg("Erro: " + (j.error || "falha"));
+      }
+    } catch {
+      setRecomputeMsg("Erro de ligação.");
+    } finally {
+      setRecomputing(false);
+    }
+  }
 
   async function doSync() {
     setSyncing(true);
@@ -156,6 +177,25 @@ export default function AdminClient({
             {syncing ? "A sincronizar…" : "Sincronizar agora"}
           </button>
           {syncMsg && <span className="text-sm text-muted">{syncMsg}</span>}
+        </div>
+
+        <div className="border-t border-line/50 pt-3 mt-1">
+          <p className="text-sm text-muted mb-2">
+            Mudaste as regras de pontuação? Recalcula os pontos de todos os jogos
+            já terminados.
+          </p>
+          <div className="flex items-center gap-3">
+            <button
+              className="btn btn-ghost"
+              onClick={doRecompute}
+              disabled={recomputing}
+            >
+              {recomputing ? "A recalcular…" : "Recalcular todos os pontos"}
+            </button>
+            {recomputeMsg && (
+              <span className="text-sm text-muted">{recomputeMsg}</span>
+            )}
+          </div>
         </div>
       </section>
 

@@ -36,6 +36,23 @@ export async function clearMatchPoints(matchId: number): Promise<void> {
     .not("points", "is", null);
 }
 
+// Recalcula os pontos de TODOS os jogos ja terminados (util depois de mudar as
+// regras de pontuacao). Devolve quantos palpites foram repontuados.
+export async function recomputeAllFinished(): Promise<number> {
+  const db = getDb();
+  const { data: matches } = await db
+    .from("matches")
+    .select("id, home_score, away_score, status")
+    .eq("status", "finished");
+  let n = 0;
+  for (const m of matches ?? []) {
+    if (m.home_score != null && m.away_score != null) {
+      n += await recomputeMatch(m.id, m.home_score, m.away_score);
+    }
+  }
+  return n;
+}
+
 export type SyncResult = {
   fetched: number;
   upserted: number;

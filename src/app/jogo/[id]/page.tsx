@@ -5,6 +5,7 @@ import { isDbConfigured } from "@/lib/db";
 import { getMatchById, getMatchPredictions } from "@/lib/queries";
 import SetupNotice from "@/components/SetupNotice";
 import MatchRow from "@/components/MatchRow";
+import { hasStarted } from "@/lib/format";
 import { scoreTier, SCORING } from "@/lib/scoring";
 import { TIER_LABEL, TIER_CLASS } from "@/lib/tiers";
 
@@ -26,11 +27,13 @@ export default async function JogoPage({
   const match = await getMatchById(matchId);
   if (!match) notFound();
 
+  // Os palpites ficam visiveis assim que o jogo COMECA (ja estao trancados).
+  const started = hasStarted(match.kickoff_utc);
   const finished =
     match.status === "finished" &&
     match.home_score != null &&
     match.away_score != null;
-  const preds = finished ? await getMatchPredictions(matchId) : [];
+  const preds = started ? await getMatchPredictions(matchId) : [];
 
   return (
     <div className="space-y-5">
@@ -42,10 +45,10 @@ export default async function JogoPage({
 
       <h2 className="display text-xl section-accent">Palpites de toda a gente</h2>
 
-      {!finished ? (
+      {!started ? (
         <div className="card p-6 text-sm text-muted leading-relaxed">
           🔒 Os palpites de toda a gente ficam visíveis{" "}
-          <strong className="text-fg">depois de o jogo terminar</strong> — assim
+          <strong className="text-fg">quando o jogo começar</strong> — assim
           ninguém é influenciado pelas escolhas dos outros.
         </div>
       ) : preds.length === 0 ? (
@@ -55,10 +58,12 @@ export default async function JogoPage({
       ) : (
         <div className="card divide-y divide-line/50">
           {preds.map((p) => {
-            const tier = scoreTier(
-              { home: p.pred_home, away: p.pred_away },
-              { home: match.home_score!, away: match.away_score! },
-            );
+            const tier = finished
+              ? scoreTier(
+                  { home: p.pred_home, away: p.pred_away },
+                  { home: match.home_score!, away: match.away_score! },
+                )
+              : null;
             return (
               <div
                 key={p.username}
@@ -74,12 +79,16 @@ export default async function JogoPage({
                   <span className="display text-fg">
                     {p.pred_home}×{p.pred_away}
                   </span>
-                  <span className={`display ${TIER_CLASS[tier]}`}>
-                    +{SCORING[tier]}
-                    <span className="text-xs ml-1 hidden sm:inline">
-                      {TIER_LABEL[tier]}
+                  {tier ? (
+                    <span className={`display ${TIER_CLASS[tier]}`}>
+                      +{SCORING[tier]}
+                      <span className="text-xs ml-1 hidden sm:inline">
+                        {TIER_LABEL[tier]}
+                      </span>
                     </span>
-                  </span>
+                  ) : (
+                    <span className="chip">a decorrer</span>
+                  )}
                 </div>
               </div>
             );

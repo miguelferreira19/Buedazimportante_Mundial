@@ -29,8 +29,7 @@ export default async function PerfilPage({
     );
   }
 
-  const isOwn = target.id === session.uid;
-  const rows = await getUserHistory(target.id, !isOwn);
+  const rows = await getUserHistory(target.id);
   const totalPts = rows.reduce((s, r) => s + (r.points ?? 0), 0);
   const exatos = rows.filter((r) => r.points === SCORING.exact).length;
   const jogados = rows.filter((r) => r.points != null).length;
@@ -53,11 +52,6 @@ export default async function PerfilPage({
             <span className="text-muted">jogos</span>
           </span>
         </div>
-        {!isOwn && (
-          <p className="text-xs text-muted mt-2">
-            A ver apenas jogos já terminados.
-          </p>
-        )}
       </div>
 
       {rows.length === 0 ? (

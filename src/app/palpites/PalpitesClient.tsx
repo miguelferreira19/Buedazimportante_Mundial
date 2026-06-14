@@ -275,12 +275,12 @@ export default function PalpitesClient({
                               +{SCORING[tier]} · {TIER_LABEL[tier]}
                             </span>
                           )}
-                          {finished && (
+                          {started && (
                             <Link
                               href={`/jogo/${m.id}`}
                               className="text-brand hover:underline whitespace-nowrap"
                             >
-                              ver todos →
+                              ver palpites →
                             </Link>
                           )}
                         </div>

@@ -150,7 +150,7 @@ export default function PalpitesClient({
             )}
           </h2>
 
-          <div className="space-y-2">
+          <div className="space-y-2 stagger">
             {list.map((m) => {
               const started = hasStarted(m.kickoff_utc, now);
               const finished = m.status === "finished";
@@ -177,7 +177,7 @@ export default function PalpitesClient({
                     <span className="flex items-center gap-2 shrink-0">
                       {m.status === "live" && (
                         <span className="chip text-brand border-brand/40">
-                          ● a decorrer
+                          <span className="live-dot" /> a decorrer
                         </span>
                       )}
                       <span>{fmtTime(m.kickoff_utc)}</span>
@@ -242,10 +242,12 @@ export default function PalpitesClient({
                         <span className="text-xs text-muted">
                           {countdown(m.kickoff_utc, now)}
                           {st === "saved" && !isDirty(m.id) && (
-                            <span className="text-good ml-2">✓ guardado</span>
+                            <span className="text-good ml-2 saved-flash">
+                              ✓ guardado
+                            </span>
                           )}
                           {errs[m.id] && (
-                            <span className="text-brand ml-2">{errs[m.id]}</span>
+                            <span className="text-red ml-2">{errs[m.id]}</span>
                           )}
                         </span>
                         <button

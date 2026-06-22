@@ -13,7 +13,9 @@ export default function MatchRow({ m }: { m: DbMatch }) {
         </span>
         <span className="flex items-center gap-2 shrink-0">
           {m.status === "live" && (
-            <span className="chip text-brand border-brand/40">● a decorrer</span>
+            <span className="chip text-brand border-brand/40">
+              <span className="live-dot" /> a decorrer
+            </span>
           )}
           <span>{fmtTime(m.kickoff_utc)}</span>
         </span>

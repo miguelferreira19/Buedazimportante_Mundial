@@ -25,6 +25,10 @@
 }
 
 :root {
+  /* Curvas de easing fortes (as nativas do CSS sao demasiado fracas p/ UI). */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* entradas: arranca rapido */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* movimento no ecra */
+
   /* Gradiente principal quente (laranja -> dourado) para botoes, titulos, acentos */
   --grad-festive: linear-gradient(100deg, #ff6a1a 0%, #ff961f 48%, #f5c84e 100%);
   /* Faixa multicolor estilo "bandeiras a irradiar" */
@@ -78,12 +82,17 @@ body {
     border-radius: 0.75rem;
     padding: 0.62rem 1.1rem;
     cursor: pointer;
-    transition: transform 0.06s ease, filter 0.15s ease, opacity 0.15s ease,
-      box-shadow 0.15s ease;
+    transition: transform 0.13s var(--ease-out), filter 0.15s ease,
+      opacity 0.15s ease, box-shadow 0.15s ease;
     border: 1px solid transparent;
   }
-  .btn:active {
-    transform: translateY(1px);
+  /* Feedback fisico ao premir: o elemento "afunda" ligeiramente. */
+  .btn:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  .btn:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--color-brand) 75%, transparent);
+    outline-offset: 2px;
   }
   .btn:disabled {
     opacity: 0.5;
@@ -124,6 +133,7 @@ body {
     text-align: center;
     font-family: var(--font-display);
     font-size: 1.35rem;
+    font-variant-numeric: tabular-nums;
     background: var(--color-ink2);
     border: 1px solid var(--color-line);
     border-radius: 0.6rem;
@@ -131,7 +141,8 @@ body {
     padding: 0.2rem 0;
     -moz-appearance: textfield;
     appearance: textfield;
-    transition: border-color 0.12s ease, outline 0.12s ease;
+    transition: border-color 0.12s var(--ease-out), outline 0.12s var(--ease-out),
+      transform 0.12s var(--ease-out);
   }
   .score-input::-webkit-outer-spin-button,
   .score-input::-webkit-inner-spin-button {
@@ -170,6 +181,8 @@ body {
 .display {
   font-family: var(--font-display);
   letter-spacing: 0.005em;
+  /* Algarismos de largura fixa: placares e pontuacoes alinham na vertical. */
+  font-variant-numeric: tabular-nums;
 }
 
 /* Barra fina multicolor no topo */
@@ -218,6 +231,109 @@ body {
 }
 .emblem-badge svg {
   position: relative;
+}
+
+/* Selecao de texto na cor da marca */
+::selection {
+  background: color-mix(in srgb, var(--color-brand) 35%, transparent);
+  color: var(--color-fg);
+}
+
+/* Entrada em cascata (stagger): cada item surge logo a seguir ao anterior.
+   Comeca a scale(0.98)+opacity em vez de scale(0) — nada no mundo real
+   aparece do nada. Animacao corre uma vez por montagem. */
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.stagger > * {
+  opacity: 0;
+  animation: riseIn 0.42s var(--ease-out) forwards;
+}
+.stagger > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger > *:nth-child(2) {
+  animation-delay: 45ms;
+}
+.stagger > *:nth-child(3) {
+  animation-delay: 90ms;
+}
+.stagger > *:nth-child(4) {
+  animation-delay: 135ms;
+}
+.stagger > *:nth-child(5) {
+  animation-delay: 180ms;
+}
+.stagger > *:nth-child(6) {
+  animation-delay: 225ms;
+}
+.stagger > *:nth-child(n + 7) {
+  animation-delay: 260ms;
+}
+
+/* Indicador "a decorrer": ponto que pulsa para comunicar estado em direto. */
+.live-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--color-brand);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand) 70%, transparent);
+  animation: livePulse 1.6s var(--ease-in-out) infinite;
+}
+@keyframes livePulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand) 65%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* Confirmacao de palpite guardado: surge suavemente. */
+.saved-flash {
+  animation: savedIn 0.3s var(--ease-out);
+}
+@keyframes savedIn {
+  from {
+    opacity: 0;
+    transform: translateX(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Acessibilidade: movimento reduzido = menos e mais suave, nao zero.
+   Mantem fades/cores, remove deslocacoes e o loop infinito da barra. */
+@media (prefers-reduced-motion: reduce) {
+  .stagger > * {
+    opacity: 1;
+    animation: none;
+  }
+  .festive-bar,
+  .live-dot {
+    animation: none;
+  }
+  .saved-flash {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Realce subtil em titulos de seccao */

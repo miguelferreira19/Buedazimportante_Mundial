@@ -45,15 +45,15 @@ export default async function ClassificacaoPage() {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="stagger">
               {rows.map((r, i) => {
                 const me =
                   r.username.toLowerCase() === user.username.toLowerCase();
                 return (
                   <tr
                     key={r.username}
-                    className={`border-b border-line/50 ${
-                      me ? "bg-brand/10" : ""
+                    className={`border-b border-line/50 transition-colors ${
+                      me ? "bg-brand/10" : "hover:bg-card2/40"
                     }`}
                   >
                     <td className="py-2.5 pl-3 display">
@@ -73,10 +73,10 @@ export default async function ClassificacaoPage() {
                     <td className="py-2.5 pr-2 text-right display text-lg">
                       {r.points}
                     </td>
-                    <td className="py-2.5 pr-2 text-right text-muted hidden sm:table-cell">
+                    <td className="py-2.5 pr-2 text-right text-muted tabular-nums hidden sm:table-cell">
                       {r.exactos}
                     </td>
-                    <td className="py-2.5 pr-3 text-right text-muted hidden sm:table-cell">
+                    <td className="py-2.5 pr-3 text-right text-muted tabular-nums hidden sm:table-cell">
                       {r.jogados}
                     </td>
                   </tr>

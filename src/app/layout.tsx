@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo_Black, Noto_Sans } from "next/font/google";
+import { Archivo_Black, Outfit } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import { getSession } from "@/lib/session";
@@ -12,9 +12,10 @@ const archivo = Archivo_Black({
   display: "swap",
 });
 
-const noto = Noto_Sans({
+// Outfit: geometrica, moderna; substitui Noto Sans no corpo.
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-noto",
+  variable: "--font-outfit",
   display: "swap",
 });
 
@@ -31,7 +32,7 @@ export default async function RootLayout({
   return (
     <html
       lang="pt-PT"
-      className={`${archivo.variable} ${noto.variable} h-full antialiased`}
+      className={`${archivo.variable} ${outfit.variable} h-full antialiased`}
     >
       <body className="min-h-dvh flex flex-col font-sans">
         <Nav
@@ -42,8 +43,10 @@ export default async function RootLayout({
         <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6 pb-24 sm:pb-8">
           {children}
         </main>
-        <footer className="text-center text-xs text-muted py-8 px-4 pb-24 sm:pb-8">
-          {SITE_NAME} · feito entre amigos ⚽
+        <footer className="mt-10 border-t border-line/60 text-center text-xs text-muted py-8 px-4 pb-24 sm:pb-8">
+          <span className="brand-text font-display">{SITE_NAME}</span>
+          <span className="mx-2 text-line">/</span>
+          feito entre amigos
         </footer>
       </body>
     </html>

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { SITE_NAME } from "@/lib/constants";
 import ScoringLegend from "@/components/ScoringLegend";
 import Emblem from "@/components/Emblem";
+import TeamRail from "@/components/TeamRail";
+import Reveal from "@/components/Reveal";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -41,16 +43,36 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="max-w-sm mx-auto space-y-6 pt-6">
-      <div className="flex flex-col items-center text-center gap-3 pt-2">
-        <Emblem size={84} />
-        <h1 className="brand-text text-3xl leading-tight">{SITE_NAME}</h1>
-        <p className="text-muted text-sm max-w-xs">
-          Faz os teus palpites, soma pontos e ganha o bolão do Mundial 2026. ⚽
-        </p>
+    <div className="relative -mt-6">
+      {/* Hero fotografico full-bleed (estadio cheio a noite), so no login.
+          z-0 (a frente do fundo opaco do body), conteudo fica em z-10. */}
+      <div aria-hidden className="fixed inset-0 z-0 overflow-hidden">
+        <div
+          className="photo photo-wash"
+          style={{ "--img": "url(/img/hero-stadium.jpg)" } as React.CSSProperties}
+        />
       </div>
 
-      <div className="card p-5">
+      <div className="relative z-10 max-w-md mx-auto space-y-7 pt-10 sm:pt-16">
+        <div className="flex flex-col items-center text-center gap-4">
+          <Emblem size={76} />
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-gold/90">
+            Canadá · México · Estados Unidos
+          </p>
+          <h1
+            className="display leading-[1.04] max-w-4xl"
+            style={{ fontSize: "clamp(2.4rem, 7vw, 3.6rem)" }}
+          >
+            O bolão do Mundial,{" "}
+            <span className="brand-text">entre amigos</span>.
+          </h1>
+          <p className="text-muted text-[0.95rem] max-w-sm leading-relaxed">
+            Faz os teus palpites, soma pontos a cada jogo e prova que percebes
+            mais de futebol do que o grupo todo.
+          </p>
+        </div>
+
+        <div className="glass p-5 sm:p-6">
         <div className="flex gap-1 mb-4 bg-ink rounded-lg p-1 border border-line">
           {(["login", "register"] as const).map((m) => (
             <button
@@ -117,7 +139,12 @@ export default function LoginForm() {
         </p>
       </div>
 
-      <ScoringLegend />
+      <TeamRail />
+
+      <Reveal>
+        <ScoringLegend />
+      </Reveal>
+      </div>
     </div>
   );
 }

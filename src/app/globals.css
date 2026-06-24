@@ -2,7 +2,7 @@
 
 @theme {
   /* Fontes (variaveis injetadas pelo next/font no <html>) */
-  --font-sans: var(--font-noto), system-ui, sans-serif;
+  --font-sans: var(--font-outfit), system-ui, sans-serif;
   --font-display: var(--font-archivo), system-ui, sans-serif;
 
   /* Paleta alinhada com o emblema do Mundial 2026: laranja + dourado + branco,
@@ -350,4 +350,166 @@ body {
   width: 4px;
   border-radius: 999px;
   background: var(--grad-festive);
+}
+
+/* =====================================================================
+   SISTEMA VISUAL — imagens reais do Mundial, motion fluido, profundidade
+   ===================================================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* --- Fotografia com tratamento (nunca "stock cru") -------------------
+   Camada de imagem + wash escuro p/ legibilidade do texto por cima.
+   A imagem entra por variavel --img (inline style no JSX). */
+.photo {
+  position: absolute;
+  inset: 0;
+  background-image: var(--img);
+  background-size: cover;
+  background-position: var(--img-pos, center);
+  /* dessatura ligeiro + contraste: parece editorial, nao banco de imagens */
+  filter: saturate(1.05) contrast(1.06) brightness(0.92);
+  transform: scale(1.04);
+  transition: transform 1.1s var(--ease-out), filter 0.6s ease;
+}
+.photo-wash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(11, 11, 21, 0.2) 0%, rgba(11, 11, 21, 0.55) 55%, var(--color-ink) 100%),
+    radial-gradient(120% 80% at 50% 0%, transparent 30%, rgba(11, 11, 21, 0.5) 100%);
+}
+/* leve zoom da foto ao passar o rato no contentor "group" */
+.group:hover .photo {
+  transform: scale(1.09);
+}
+
+/* Banda fotografica fina usada como cabecalho de pagina */
+.photo-band {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  border: 1px solid var(--color-line);
+  isolation: isolate;
+}
+
+/* --- Cartoes que reagem (hover physics) ----------------------------- */
+.lift {
+  transition: transform 0.4s var(--ease-out), border-color 0.3s ease,
+    box-shadow 0.45s ease;
+  will-change: transform;
+}
+.lift:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--color-brand) 55%, var(--color-line));
+  box-shadow:
+    0 26px 60px -32px rgba(245, 144, 30, 0.55),
+    0 10px 30px -18px rgba(0, 0, 0, 0.8);
+}
+
+/* --- Vidro forte (form de login sobre a foto) ----------------------- */
+.glass {
+  background: color-mix(in srgb, var(--color-card) 70%, transparent);
+  border: 1px solid color-mix(in srgb, #ffffff 11%, var(--color-line));
+  border-radius: 1.25rem;
+  backdrop-filter: blur(22px) saturate(1.15);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
+    0 40px 90px -50px rgba(0, 0, 0, 0.95);
+}
+
+/* --- Revelar ao scroll (IntersectionObserver poe .is-visible) ------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* --- Podio da classificacao (top 3) --------------------------------- */
+.podium {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.1rem;
+  border: 1px solid var(--color-line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
+}
+.podium-rank-1 {
+  border-color: color-mix(in srgb, var(--color-gold) 60%, var(--color-line));
+  box-shadow: 0 20px 50px -30px rgba(242, 193, 78, 0.6);
+}
+.podium-medal {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+/* --- Carrossel infinito de selecoes (faixa de "ambiente Mundial") --- */
+.rail-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.rail {
+  display: inline-flex;
+  gap: 1.5rem;
+  white-space: nowrap;
+  animation: railSlide 38s linear infinite;
+}
+.rail:hover {
+  animation-play-state: paused;
+}
+@keyframes railSlide {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* --- Escudo/bandeira com aro p/ assentar sobre fundo escuro ---------- */
+.crest-ring {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-card2) 80%, transparent);
+  border: 1px solid var(--color-line);
+  overflow: hidden;
+  flex: none;
+}
+
+/* --- Estado "trancado" elegante (substitui o emoji cadeado cru) ----- */
+.locked {
+  display: inline-grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.7rem;
+  color: var(--color-muted);
+  background: color-mix(in srgb, var(--color-ink2) 80%, transparent);
+  border: 1px solid var(--color-line);
+}
+
+/* Movimento reduzido: corta deslocacoes/loops, mantem visibilidade */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .photo {
+    transform: none;
+    transition: none;
+  }
+  .rail {
+    animation: none;
+  }
 }

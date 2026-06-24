@@ -84,9 +84,11 @@ export default function Nav({ user }: { user: NavUser }) {
         <div className="max-w-3xl mx-auto px-4 py-2.5 flex items-center gap-3">
           <Link
             href={user ? "/palpites" : "/login"}
-            className="shrink-0 flex items-center gap-2"
+            className="group shrink-0 flex items-center gap-2"
           >
-            <Emblem size={30} />
+            <span className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+              <Emblem size={30} />
+            </span>
             <span className="brand-text text-base sm:text-lg leading-none max-w-[52vw] sm:max-w-none truncate">
               {SITE_NAME}
             </span>

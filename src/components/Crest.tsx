@@ -15,21 +15,21 @@ export default function Crest({
     return (
       <span
         aria-hidden
-        style={{ width: size, height: size, fontSize: size * 0.9 }}
-        className="inline-flex items-center justify-center"
+        style={{ width: size, height: size, fontSize: size * 0.58 }}
+        className="crest-ring"
       >
         🏳️
       </span>
     );
   }
   return (
-    <img
-      src={src}
-      alt={alt}
-      width={size}
-      height={size}
-      loading="lazy"
-      style={{ width: size, height: size, objectFit: "contain" }}
-    />
+    <span className="crest-ring" style={{ width: size, height: size }}>
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        style={{ width: "78%", height: "78%", objectFit: "contain" }}
+      />
+    </span>
   );
 }

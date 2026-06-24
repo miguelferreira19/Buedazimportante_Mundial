@@ -4,6 +4,7 @@ import { isDbConfigured } from "@/lib/db";
 import { getUserByUsername, getUserHistory } from "@/lib/queries";
 import SetupNotice from "@/components/SetupNotice";
 import Crest from "@/components/Crest";
+import CountUp from "@/components/CountUp";
 import { fmtKickoff } from "@/lib/format";
 import { scoreTier, SCORING, type ScoreTier } from "@/lib/scoring";
 import { TIER_LABEL, TIER_CLASS } from "@/lib/tiers";
@@ -36,21 +37,35 @@ export default async function PerfilPage({
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="display text-3xl">{target.username}</h1>
-        <div className="flex gap-4 mt-2 text-sm">
-          <span>
-            <span className="display text-xl text-fg">{totalPts}</span>{" "}
-            <span className="text-muted">pontos</span>
-          </span>
-          <span>
-            <span className="display text-xl text-good">{exatos}</span>{" "}
-            <span className="text-muted">exatos</span>
-          </span>
-          <span>
-            <span className="display text-xl text-fg">{jogados}</span>{" "}
-            <span className="text-muted">jogos</span>
-          </span>
+      <div className="flex items-center gap-4">
+        <span
+          aria-hidden
+          className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-card2 border border-line display text-2xl uppercase"
+        >
+          {target.username.charAt(0)}
+        </span>
+        <div className="min-w-0">
+          <h1 className="display text-3xl truncate">{target.username}</h1>
+          <div className="flex gap-4 mt-2 text-sm">
+            <span>
+              <span className="display text-xl text-fg">
+                <CountUp value={totalPts} />
+              </span>{" "}
+              <span className="text-muted">pontos</span>
+            </span>
+            <span>
+              <span className="display text-xl text-good">
+                <CountUp value={exatos} />
+              </span>{" "}
+              <span className="text-muted">exatos</span>
+            </span>
+            <span>
+              <span className="display text-xl text-fg">
+                <CountUp value={jogados} />
+              </span>{" "}
+              <span className="text-muted">jogos</span>
+            </span>
+          </div>
         </div>
       </div>
 
@@ -71,7 +86,7 @@ export default async function PerfilPage({
               );
             }
             return (
-              <div key={m.id} className="card p-3">
+              <div key={m.id} className="card lift p-3">
                 <div className="flex items-center justify-between text-xs text-muted mb-2">
                   <span className="truncate">{m.grp ?? m.stage ?? ""}</span>
                   <span>{fmtKickoff(m.kickoff_utc)}</span>

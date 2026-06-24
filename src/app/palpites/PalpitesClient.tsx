@@ -60,6 +60,17 @@ export default function PalpitesClient({
 
   const visibleDays = days.filter(([k]) => showPast || k >= todayKey);
 
+  // Proximo jogo a comecar (para o cabecalho).
+  const nextMatch = useMemo(() => {
+    const up = matches
+      .filter((m) => new Date(m.kickoff_utc).getTime() > now)
+      .sort(
+        (a, b) =>
+          new Date(a.kickoff_utc).getTime() - new Date(b.kickoff_utc).getTime(),
+      );
+    return up[0] ?? null;
+  }, [matches, now]);
+
   function setField(id: number, side: "home" | "away", val: string) {
     const v = val.replace(/[^0-9]/g, "").slice(0, 2);
     setPreds((p) => ({
@@ -121,13 +132,50 @@ export default function PalpitesClient({
 
   return (
     <div className="space-y-6">
-      <label className="flex items-center gap-2 text-sm text-muted">
+      {/* Cabecalho fotografico: relvado lotado + proximo jogo */}
+      <header className="photo-band group">
+        <div
+          className="photo photo-wash"
+          style={{ "--img": "url(/img/pitch-day.jpg)" } as React.CSSProperties}
+        />
+        <div className="relative z-10 p-5 sm:p-7">
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.26em] text-gold/90">
+            Mundial 2026
+          </p>
+          <h1
+            className="display mt-1 leading-[1.05]"
+            style={{ fontSize: "clamp(1.9rem, 5.4vw, 2.8rem)" }}
+          >
+            Os teus palpites
+          </h1>
+          {nextMatch && (
+            <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+              <span className="chip border-brand/40 text-brand">
+                <span className="live-dot" /> a seguir
+              </span>
+              <span className="flex items-center gap-2 font-semibold">
+                <Crest src={nextMatch.home_crest} alt="" size={18} />
+                {nextMatch.home_name ?? "A definir"}
+                <span className="text-muted">×</span>
+                {nextMatch.away_name ?? "A definir"}
+                <Crest src={nextMatch.away_crest} alt="" size={18} />
+              </span>
+              <span className="text-muted">
+                {countdown(nextMatch.kickoff_utc, now)}
+              </span>
+            </div>
+          )}
+        </div>
+      </header>
+
+      <label className="card flex items-center justify-between gap-3 px-4 py-2.5 text-sm cursor-pointer select-none">
+        <span className="text-muted">Mostrar também os jogos já passados</span>
         <input
           type="checkbox"
+          className="accent-brand h-4 w-4"
           checked={showPast}
           onChange={(e) => setShowPast(e.target.checked)}
         />
-        Mostrar também os jogos já passados
       </label>
 
       {visibleDays.length === 0 && (
@@ -168,7 +216,7 @@ export default function PalpitesClient({
               }
 
               return (
-                <div key={m.id} className="card p-3">
+                <div key={m.id} className="card lift p-3">
                   <div className="flex items-center justify-between text-xs text-muted mb-2">
                     <span className="truncate">
                       {m.grp ?? m.stage ?? ""}
@@ -217,12 +265,30 @@ export default function PalpitesClient({
                             aria-label={`Golos ${m.away_name}`}
                           />
                         </>
-                      ) : (
+                      ) : finished ? (
                         <div className="display text-2xl px-2">
-                          {finished
-                            ? `${m.home_score} × ${m.away_score}`
-                            : "🔒"}
+                          {m.home_score} × {m.away_score}
                         </div>
+                      ) : (
+                        <span
+                          className="locked"
+                          aria-label="Palpites fechados"
+                          title="Palpites fechados"
+                        >
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <rect x="3" y="11" width="18" height="11" rx="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                          </svg>
+                        </span>
                       )}
                     </div>
 

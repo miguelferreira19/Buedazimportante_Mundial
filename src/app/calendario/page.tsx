@@ -34,12 +34,26 @@ export default async function CalendarioPage() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="display text-3xl section-accent">Calendário</h1>
-        <p className="text-muted text-sm mt-1">
-          Todos os jogos do Mundial e os resultados.
-        </p>
-      </div>
+      <header className="photo-band group">
+        <div
+          className="photo photo-wash"
+          style={{ "--img": "url(/img/tunnel.jpg)" } as React.CSSProperties}
+        />
+        <div className="relative z-10 p-5 sm:p-7">
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.26em] text-gold/90">
+            48 seleções · 104 jogos
+          </p>
+          <h1
+            className="display mt-1 leading-[1.05]"
+            style={{ fontSize: "clamp(1.9rem, 5.4vw, 2.8rem)" }}
+          >
+            Calendário
+          </h1>
+          <p className="text-muted text-sm mt-2">
+            Todos os jogos do Mundial e os resultados, hora de Portugal.
+          </p>
+        </div>
+      </header>
 
       {matches.length === 0 ? (
         <div className="card p-6 text-sm text-muted">
@@ -57,7 +71,7 @@ export default async function CalendarioPage() {
                 <Link
                   key={m.id}
                   href={`/jogo/${m.id}`}
-                  className="block transition-opacity hover:opacity-90"
+                  className="block rounded-[1.1rem] lift"
                 >
                   <MatchRow m={m} />
                 </Link>

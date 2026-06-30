@@ -7,6 +7,7 @@ import Link from "next/link";
 import { scoreTier, SCORING, type ScoreTier } from "@/lib/scoring";
 import { TIER_LABEL, TIER_CLASS } from "@/lib/tiers";
 import Crest from "@/components/Crest";
+import TeamName from "@/components/TeamName";
 
 type PredInput = { home: string; away: string };
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -256,9 +257,11 @@ export default function PalpitesClient({
                   <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2.5">
                     {/* Casa */}
                     <div className="flex items-center gap-2.5 min-w-0 justify-end text-right">
-                      <span className="truncate font-semibold">
-                        {m.home_name ?? "A definir"}
-                      </span>
+                      <TeamName
+                        name={m.home_name}
+                        code={m.home_code}
+                        className="font-semibold"
+                      />
                       <Crest src={m.home_crest} alt={m.home_name ?? ""} size={28} />
                     </div>
 
@@ -320,9 +323,11 @@ export default function PalpitesClient({
                     {/* Fora */}
                     <div className="flex items-center gap-2.5 min-w-0">
                       <Crest src={m.away_crest} alt={m.away_name ?? ""} size={28} />
-                      <span className="truncate font-semibold">
-                        {m.away_name ?? "A definir"}
-                      </span>
+                      <TeamName
+                        name={m.away_name}
+                        code={m.away_code}
+                        className="font-semibold"
+                      />
                     </div>
                   </div>
 

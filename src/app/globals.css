@@ -22,7 +22,7 @@
   --color-line2: #353a57; /* hairline mais clara (hover/realce) */
   --color-fg: #f6f7fb;
   --color-muted: #9aa0bd; /* texto secundário (AA sobre ink) */
-  --color-faint: #6b7194; /* texto terciário */
+  --color-faint: #7e86ac; /* texto terciário (>= 4.5:1 sobre ink, AA) */
 
   /* --- Acento + semântica --------------------------------------------- */
   --color-brand: #f5901e; /* laranja — único acento da app */

@@ -4,6 +4,7 @@ import { isDbConfigured } from "@/lib/db";
 import { getUserByUsername, getUserHistory } from "@/lib/queries";
 import SetupNotice from "@/components/SetupNotice";
 import Crest from "@/components/Crest";
+import TeamName from "@/components/TeamName";
 import CountUp from "@/components/CountUp";
 import { fmtKickoff } from "@/lib/format";
 import { scoreTier, SCORING, type ScoreTier } from "@/lib/scoring";
@@ -106,13 +107,17 @@ export default async function PerfilPage({
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <Crest src={m.home_crest} alt={m.home_name ?? ""} size={20} />
-                    <span className="truncate text-sm font-medium">
-                      {m.home_name ?? "?"}
-                    </span>
+                    <TeamName
+                      name={m.home_name}
+                      code={m.home_code}
+                      className="text-sm font-medium"
+                    />
                     <span className="text-faint text-sm">×</span>
-                    <span className="truncate text-sm font-medium">
-                      {m.away_name ?? "?"}
-                    </span>
+                    <TeamName
+                      name={m.away_name}
+                      code={m.away_code}
+                      className="text-sm font-medium"
+                    />
                     <Crest src={m.away_crest} alt={m.away_name ?? ""} size={20} />
                   </div>
                   <div className="flex items-center gap-2.5 shrink-0 text-sm">

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Outfit } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
@@ -19,9 +19,45 @@ const outfit = Outfit({
   display: "swap",
 });
 
+const DESCRIPTION =
+  "Faz os teus palpites, soma pontos a cada jogo e prova que percebes mais de futebol do que o grupo todo.";
+
 export const metadata: Metadata = {
-  title: SITE_NAME,
-  description: "Torneio de palpites do Mundial 2026 entre amigos.",
+  metadataBase: new URL("https://buedazimportante-mundial.vercel.app"),
+  title: { default: SITE_NAME, template: `%s · ${SITE_NAME}` },
+  description: DESCRIPTION,
+  applicationName: SITE_NAME,
+  appleWebApp: {
+    capable: true,
+    title: "Palpites",
+    statusBarStyle: "black-translucent",
+  },
+  icons: { icon: "/icon.svg", apple: "/icon.svg" },
+  openGraph: {
+    type: "website",
+    locale: "pt_PT",
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: DESCRIPTION,
+    url: "/",
+    images: [
+      {
+        url: "/img/hero-stadium.jpg",
+        alt: "Bolão do Mundial 2026 entre amigos",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: DESCRIPTION,
+    images: ["/img/hero-stadium.jpg"],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a12",
+  colorScheme: "dark",
 };
 
 export default async function RootLayout({

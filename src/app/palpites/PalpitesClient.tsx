@@ -40,25 +40,36 @@ export default function PalpitesClient({
 
   const todayKey = dayKey(new Date(now).toISOString());
 
-  const days = useMemo(() => {
-    const map = new Map<string, DbMatch[]>();
+  // Separa por JOGO: "por jogar" (ainda não começou) vs "resultados" (já começou).
+  const { upcoming, results } = useMemo(() => {
+    const up = new Map<string, DbMatch[]>();
+    const res = new Map<string, DbMatch[]>();
     for (const m of matches) {
+      const target = hasStarted(m.kickoff_utc, now) ? res : up;
       const k = dayKey(m.kickoff_utc);
-      if (!map.has(k)) map.set(k, []);
-      map.get(k)!.push(m);
+      if (!target.has(k)) target.set(k, []);
+      target.get(k)!.push(m);
     }
-    const arr = [...map.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1));
-    for (const [, list] of arr) {
-      list.sort(
+    // Por jogar: cronológico, o próximo primeiro.
+    const upArr = [...up.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1));
+    for (const [, l] of upArr)
+      l.sort(
         (a, b) =>
           new Date(a.kickoff_utc).getTime() -
             new Date(b.kickoff_utc).getTime() || a.id - b.id,
       );
-    }
-    return arr;
-  }, [matches]);
+    // Resultados: mais recentes primeiro (dias e jogos por ordem decrescente).
+    const resArr = [...res.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1));
+    for (const [, l] of resArr)
+      l.sort(
+        (a, b) =>
+          new Date(b.kickoff_utc).getTime() -
+            new Date(a.kickoff_utc).getTime() || b.id - a.id,
+      );
+    return { upcoming: upArr, results: resArr };
+  }, [matches, now]);
 
-  const visibleDays = days.filter(([k]) => showPast || k >= todayKey);
+  const visibleDays = showPast ? results : upcoming;
 
   // Quantos jogos abertos ainda sem palpite (foco da pagina).
   const openNoPred = useMemo(() => {
@@ -156,7 +167,7 @@ export default function PalpitesClient({
         <div className="inline-flex rounded-full border border-line bg-card2/40 p-0.5 text-sm">
           {[
             { v: false, label: "Por jogar" },
-            { v: true, label: "Tudo" },
+            { v: true, label: "Resultados" },
           ].map((o) => (
             <button
               key={String(o.v)}
@@ -176,8 +187,12 @@ export default function PalpitesClient({
 
       {visibleDays.length === 0 && (
         <EmptyCard
-          title="Sem jogos por jogar"
-          body="Estás em dia com os palpites. Carrega em “Tudo” para rever os jogos anteriores."
+          title={showPast ? "Ainda sem resultados" : "Sem jogos por jogar"}
+          body={
+            showPast
+              ? "Os jogos já começados aparecem aqui, do mais recente para o mais antigo."
+              : "Estás em dia com os palpites. Toca em “Resultados” para rever os jogos anteriores."
+          }
         />
       )}
 

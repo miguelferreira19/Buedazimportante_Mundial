@@ -40,13 +40,16 @@ export default async function RootLayout({
             user ? { username: user.username, isAdmin: user.isAdmin } : null
           }
         />
-        <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6 pb-24 sm:pb-8">
+        <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-7 pb-28 sm:pb-10">
           {children}
         </main>
-        <footer className="mt-10 border-t border-line/60 text-center text-xs text-muted py-8 px-4 pb-24 sm:pb-8">
-          <span className="brand-text font-display">{SITE_NAME}</span>
-          <span className="mx-2 text-line">/</span>
-          feito entre amigos
+        <footer className="mt-12 border-t border-line/60 px-4 py-9 pb-28 sm:pb-9">
+          <div className="max-w-3xl mx-auto flex flex-col items-center gap-1.5 text-center">
+            <span className="brand-text text-base">{SITE_NAME}</span>
+            <p className="text-xs text-faint">
+              Feito entre amigos. Resultados pelos 90 minutos.
+            </p>
+          </div>
         </footer>
       </body>
     </html>

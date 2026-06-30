@@ -22,16 +22,5 @@ export default async function PalpitesPage() {
     initialPreds[id] = { home: p.pred_home, away: p.pred_away };
   });
 
-  return (
-    <div className="space-y-5">
-      <div>
-        <h1 className="display text-3xl section-accent">Os meus palpites</h1>
-        <p className="text-muted text-sm mt-1">
-          Mete o teu resultado em cada jogo. Cada jogo fecha no apito inicial —
-          depois disso já não dá para mudar.
-        </p>
-      </div>
-      <PalpitesClient matches={matches} initialPreds={initialPreds} />
-    </div>
-  );
+  return <PalpitesClient matches={matches} initialPreds={initialPreds} />;
 }

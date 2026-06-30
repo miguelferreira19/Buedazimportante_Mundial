@@ -21,8 +21,7 @@ export default function LoginForm() {
     setErr(null);
     setBusy(true);
     try {
-      const url =
-        mode === "login" ? "/api/auth/login" : "/api/auth/register";
+      const url = mode === "login" ? "/api/auth/login" : "/api/auth/register";
       const res = await fetch(url, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -43,7 +42,7 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="relative -mt-6">
+    <div className="relative -mt-7">
       {/* Hero fotografico full-bleed (estadio cheio a noite), so no login.
           z-0 (a frente do fundo opaco do body), conteudo fica em z-10. */}
       <div aria-hidden className="fixed inset-0 z-0 overflow-hidden">
@@ -53,18 +52,12 @@ export default function LoginForm() {
         />
       </div>
 
-      <div className="relative z-10 max-w-md mx-auto space-y-7 pt-10 sm:pt-16">
+      <div className="relative z-10 max-w-md mx-auto space-y-7 pt-12 sm:pt-16">
         <div className="flex flex-col items-center text-center gap-4">
-          <Emblem size={76} />
-          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-gold/90">
-            Canadá · México · Estados Unidos
-          </p>
-          <h1
-            className="display leading-[1.04] max-w-4xl"
-            style={{ fontSize: "clamp(2.4rem, 7vw, 3.6rem)" }}
-          >
-            O bolão do Mundial,{" "}
-            <span className="brand-text">entre amigos</span>.
+          <Emblem size={72} />
+          <p className="eyebrow">Canadá, México e Estados Unidos</p>
+          <h1 className="h-hero max-w-4xl">
+            O bolão do Mundial, <span className="brand-text">entre amigos</span>.
           </h1>
           <p className="text-muted text-[0.95rem] max-w-sm leading-relaxed">
             Faz os teus palpites, soma pontos a cada jogo e prova que percebes
@@ -73,77 +66,82 @@ export default function LoginForm() {
         </div>
 
         <div className="glass p-5 sm:p-6">
-        <div className="flex gap-1 mb-4 bg-ink rounded-lg p-1 border border-line">
-          {(["login", "register"] as const).map((m) => (
-            <button
-              key={m}
-              onClick={() => {
-                setMode(m);
-                setErr(null);
-              }}
-              className={`flex-1 py-1.5 rounded-md text-sm font-semibold transition-colors ${
-                mode === m ? "bg-card2 text-fg" : "text-muted"
-              }`}
-            >
-              {m === "login" ? "Entrar" : "Criar conta"}
+          <div className="flex gap-1 mb-4 bg-ink/70 rounded-full p-1 border border-line">
+            {(["login", "register"] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => {
+                  setMode(m);
+                  setErr(null);
+                }}
+                aria-pressed={mode === m}
+                className={`flex-1 py-1.5 rounded-full text-sm font-semibold transition-colors ${
+                  mode === m
+                    ? "bg-card2 text-fg shadow-sm"
+                    : "text-muted hover:text-fg"
+                }`}
+              >
+                {m === "login" ? "Entrar" : "Criar conta"}
+              </button>
+            ))}
+          </div>
+
+          <form onSubmit={submit} className="space-y-3">
+            <div className="space-y-1.5">
+              <label htmlFor="username" className="text-xs text-muted font-medium">
+                Nome de utilizador
+              </label>
+              <input
+                id="username"
+                className="input"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoCapitalize="none"
+                autoComplete="username"
+                placeholder="ex.: joao_silva"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="text-xs text-muted font-medium">
+                Palavra-passe
+              </label>
+              <input
+                id="password"
+                className="input"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete={
+                  mode === "login" ? "current-password" : "new-password"
+                }
+                placeholder="mínimo 6 caracteres"
+              />
+            </div>
+
+            {err && (
+              <p className="text-sm text-red bg-red/10 border border-red/30 rounded-md px-3 py-2">
+                {err}
+              </p>
+            )}
+
+            <button type="submit" disabled={busy} className="btn btn-primary w-full">
+              {busy
+                ? "A processar…"
+                : mode === "login"
+                  ? "Entrar"
+                  : "Criar conta"}
             </button>
-          ))}
+          </form>
+          <p className="text-xs text-faint mt-3 text-center">
+            Sem email. Só nome e palavra-passe, por isso guarda-a bem.
+          </p>
         </div>
 
-        <form onSubmit={submit} className="space-y-3">
-          <div>
-            <label className="text-xs text-muted">Nome de utilizador</label>
-            <input
-              className="input mt-1"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              autoCapitalize="none"
-              autoComplete="username"
-              placeholder="ex.: joao_silva"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-muted">Palavra-passe</label>
-            <input
-              className="input mt-1"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete={
-                mode === "login" ? "current-password" : "new-password"
-              }
-              placeholder="mínimo 6 caracteres"
-            />
-          </div>
+        <TeamRail />
 
-          {err && (
-            <p className="text-sm text-brand bg-brand/10 border border-brand/30 rounded-lg px-3 py-2">
-              {err}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={busy}
-            className="btn btn-primary w-full"
-          >
-            {busy
-              ? "A processar…"
-              : mode === "login"
-                ? "Entrar"
-                : "Criar conta"}
-          </button>
-        </form>
-        <p className="text-xs text-muted mt-3 text-center">
-          Sem email — só nome e palavra-passe. Guarda-a bem!
-        </p>
-      </div>
-
-      <TeamRail />
-
-      <Reveal>
-        <ScoringLegend />
-      </Reveal>
+        <Reveal>
+          <ScoringLegend />
+        </Reveal>
       </div>
     </div>
   );

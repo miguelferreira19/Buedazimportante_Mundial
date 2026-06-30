@@ -1,98 +1,248 @@
 @import "tailwindcss";
 
+/* =====================================================================
+   SISTEMA DE DESIGN — Palpites Mundial 2026
+   Linguagem: produto desportivo premium. Base escura quente, um único
+   acento (laranja), dourado reservado a momentos de troféu. Movimento
+   com propósito, só CSS (sem libs). Tudo respeita reduced-motion.
+   ===================================================================== */
+
 @theme {
-  /* Fontes (variaveis injetadas pelo next/font no <html>) */
+  /* --- Tipografia ------------------------------------------------------ */
   --font-sans: var(--font-outfit), system-ui, sans-serif;
   --font-display: var(--font-archivo), system-ui, sans-serif;
 
-  /* Paleta alinhada com o emblema do Mundial 2026: laranja + dourado + branco,
-     sobre fundo escuro, com acentos de cores de bandeiras. */
-  --color-ink: #0b0b15;
-  --color-ink2: #11121f;
-  --color-card: #161826;
-  --color-card2: #1f2236;
-  --color-line: #313550;
-  --color-fg: #f7f8fc;
-  --color-muted: #9aa0bd;
+  /* --- Cor: base escura quente ---------------------------------------- */
+  --color-ink: #0a0a12; /* fundo da app */
+  --color-ink2: #101120; /* campos, poços */
+  --color-ink3: #0d0e1a; /* barras translúcidas */
+  --color-card: #141624; /* superfície de cartão */
+  --color-card2: #1c1f31; /* superfície elevada */
+  --color-line: #282c42; /* contornos */
+  --color-line2: #353a57; /* hairline mais clara (hover/realce) */
+  --color-fg: #f6f7fb;
+  --color-muted: #9aa0bd; /* texto secundário (AA sobre ink) */
+  --color-faint: #6b7194; /* texto terciário */
 
-  --color-brand: #f5901e; /* laranja (cor dominante do logo) */
-  --color-gold: #f2c14e; /* dourado (troféu) */
-  --color-good: #34c97a; /* verde */
-  --color-cyan: #16cde0; /* turquesa */
+  /* --- Acento + semântica --------------------------------------------- */
+  --color-brand: #f5901e; /* laranja — único acento da app */
+  --color-brand-deep: #ff6a1a;
+  --color-gold: #f2c14e; /* dourado — só troféu/1.º lugar */
+  --color-good: #34c97a; /* acerto/positivo */
+  --color-cyan: #16cde0; /* tier "golos de uma equipa" */
   --color-blue: #2f6bff;
-  --color-red: #e5392f;
+  --color-red: #ff5446; /* erro/perigo */
   --color-purple: #9b30e0;
+
+  /* --- Raio: UMA escala, aplicada em todo o lado ---------------------- */
+  --radius-sm: 0.55rem;
+  --radius-md: 0.8rem; /* botões, inputs */
+  --radius-lg: 1rem; /* cartões */
+  --radius-xl: 1.25rem; /* heros, vidro, bandas */
+  --radius-2xl: 1.6rem;
+  --radius-full: 999px;
+
+  /* --- Elevação: sombras quentes, nunca preto puro -------------------- */
+  --shadow-sm: 0 2px 8px -4px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 12px 32px -18px rgba(0, 0, 0, 0.85);
+  --shadow-lg: 0 30px 70px -34px rgba(0, 0, 0, 0.9);
+  --shadow-brand: 0 18px 44px -20px rgba(245, 144, 30, 0.55);
 }
 
 :root {
-  /* Curvas de easing fortes (as nativas do CSS sao demasiado fracas p/ UI). */
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* entradas: arranca rapido */
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* movimento no ecra */
+  /* Curvas de easing fortes (as nativas do CSS são fracas demais p/ UI). */
+  --ease-out: cubic-bezier(0.22, 1, 0.32, 1); /* entradas: arranca rápido */
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1); /* movimento no ecrã */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* leve overshoot */
 
-  /* Gradiente principal quente (laranja -> dourado) para botoes, titulos, acentos */
-  --grad-festive: linear-gradient(100deg, #ff6a1a 0%, #ff961f 48%, #f5c84e 100%);
-  /* Faixa multicolor estilo "bandeiras a irradiar" */
-  --grad-festive-wide: linear-gradient(
+  /* Gradiente quente principal (laranja -> dourado) */
+  --grad-festive: linear-gradient(105deg, #ff6a1a 0%, #ff961f 50%, #f5c84e 100%);
+  /* Faixa fina do topo: shimmer quente premium (sem carnaval) */
+  --grad-bar: linear-gradient(
     90deg,
-    #ff8c1f,
-    #e5392f,
-    #2f6bff,
-    #1faa55,
+    #ff6a1a,
+    #f5901e,
     #f2c14e,
-    #9b30e0,
-    #16cde0,
-    #ff8c1f
+    #f5901e,
+    #ff6a1a
   );
 }
 
+/* ---------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------- */
 html {
   background: var(--color-ink);
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   background:
-    radial-gradient(900px 520px at 88% -8%, rgba(245, 144, 30, 0.2), transparent 60%),
-    radial-gradient(820px 480px at 8% 2%, rgba(229, 57, 47, 0.14), transparent 58%),
-    radial-gradient(700px 520px at 50% 108%, rgba(47, 107, 255, 0.12), transparent 60%),
-    radial-gradient(680px 420px at 110% 60%, rgba(242, 193, 78, 0.12), transparent 60%),
+    radial-gradient(1000px 560px at 86% -10%, rgba(245, 144, 30, 0.16), transparent 62%),
+    radial-gradient(840px 480px at 6% 0%, rgba(255, 106, 26, 0.1), transparent 60%),
+    radial-gradient(760px 560px at 50% 112%, rgba(47, 107, 255, 0.09), transparent 62%),
     var(--color-ink);
   color: var(--color-fg);
   min-height: 100dvh;
+  font-feature-settings: "ss01", "cv01";
 }
 
+/* Grão fixo subtil: tira o "liso digital", dá textura de impressão.
+   Camada fixa, sem eventos, leve. Desliga em reduced-transparency. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Tipografia mais nítida em titulos display */
+.display,
+.brand-text,
+.h-hero,
+.h-page,
+.h-section {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Escala tipográfica fluida — fim dos clamp() inline espalhados pelos ecrãs */
+.h-hero {
+  font-size: clamp(2.4rem, 7vw, 3.7rem);
+  line-height: 1.02;
+  letter-spacing: -0.012em;
+}
+.h-page {
+  font-size: clamp(1.85rem, 5.2vw, 2.7rem);
+  line-height: 1.05;
+  letter-spacing: -0.008em;
+}
+.h-section {
+  font-size: clamp(1.3rem, 3.2vw, 1.65rem);
+  line-height: 1.1;
+  letter-spacing: -0.005em;
+}
+.display {
+  letter-spacing: 0.003em;
+}
+
+/* Etiqueta superior (eyebrow) — discreta, dourada */
+.eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: color-mix(in srgb, var(--color-gold) 90%, white);
+}
+
+/* Texto com o gradiente quente */
+.brand-text {
+  background: var(--grad-festive);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 0.004em;
+}
+
+/* Realce subtil à esquerda de títulos de secção */
+.section-accent {
+  position: relative;
+  padding-left: 0.75rem;
+}
+.section-accent::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.12em;
+  bottom: 0.12em;
+  width: 4px;
+  border-radius: var(--radius-full);
+  background: var(--grad-festive);
+}
+
+/* ---------------------------------------------------------------------
+   Foco acessível — UM anel coerente em tudo o que é interativo
+   --------------------------------------------------------------------- */
+:where(a, button, input, [tabindex], summary):focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-brand) 80%, transparent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Scrollbar discreta */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line2) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-line2);
+  border-radius: var(--radius-full);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Seleção na cor da marca */
+::selection {
+  background: color-mix(in srgb, var(--color-brand) 32%, transparent);
+  color: var(--color-fg);
+}
+
+/* ---------------------------------------------------------------------
+   Componentes
+   --------------------------------------------------------------------- */
 @layer components {
   .card {
     position: relative;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
-      color-mix(in srgb, var(--color-card) 90%, transparent);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0)),
+      color-mix(in srgb, var(--color-card) 92%, transparent);
     border: 1px solid var(--color-line);
-    border-radius: 1.1rem;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.8);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
   }
 
+  /* Cartão que reage ao toque do rato (profundidade) */
+  .lift {
+    transition: transform 0.4s var(--ease-out), border-color 0.3s ease,
+      box-shadow 0.45s ease;
+    will-change: transform;
+  }
+  .lift:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--color-brand) 45%, var(--color-line));
+    box-shadow: var(--shadow-brand), var(--shadow-md);
+  }
+  .lift:active {
+    transform: translateY(-1px) scale(0.995);
+  }
+
+  /* Botões ----------------------------------------------------------- */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     font-weight: 700;
-    letter-spacing: 0.01em;
-    border-radius: 0.75rem;
-    padding: 0.62rem 1.1rem;
+    letter-spacing: 0.005em;
+    line-height: 1;
+    white-space: nowrap;
+    border-radius: var(--radius-md);
+    padding: 0.66rem 1.1rem;
     cursor: pointer;
-    transition: transform 0.13s var(--ease-out), filter 0.15s ease,
-      opacity 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.13s var(--ease-out), filter 0.18s ease,
+      opacity 0.18s ease, box-shadow 0.22s ease, border-color 0.18s ease;
     border: 1px solid transparent;
   }
-  /* Feedback fisico ao premir: o elemento "afunda" ligeiramente. */
   .btn:active:not(:disabled) {
     transform: scale(0.97);
-  }
-  .btn:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--color-brand) 75%, transparent);
-    outline-offset: 2px;
   }
   .btn:disabled {
     opacity: 0.5;
@@ -101,102 +251,227 @@ body {
   .btn-primary {
     background: var(--grad-festive);
     color: #2a1500;
-    box-shadow: 0 8px 24px -10px rgba(245, 144, 30, 0.65);
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.32) inset, var(--shadow-brand);
   }
   .btn-primary:hover:not(:disabled) {
-    filter: brightness(1.07) saturate(1.06);
+    filter: brightness(1.06) saturate(1.05);
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.4) inset,
+      0 22px 50px -20px rgba(245, 144, 30, 0.7);
   }
   .btn-ghost {
-    background: var(--color-card2);
+    background: color-mix(in srgb, var(--color-card2) 75%, transparent);
     color: var(--color-fg);
     border-color: var(--color-line);
   }
   .btn-ghost:hover:not(:disabled) {
-    border-color: var(--color-brand);
+    border-color: color-mix(in srgb, var(--color-brand) 55%, var(--color-line));
+    background: var(--color-card2);
   }
 
+  /* Campos ----------------------------------------------------------- */
   .input {
     background: var(--color-ink2);
     border: 1px solid var(--color-line);
-    border-radius: 0.65rem;
+    border-radius: var(--radius-md);
     color: var(--color-fg);
-    padding: 0.58rem 0.72rem;
+    padding: 0.62rem 0.78rem;
     width: 100%;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .input::placeholder {
+    color: var(--color-faint);
   }
   .input:focus {
-    outline: 2px solid color-mix(in srgb, var(--color-brand) 70%, transparent);
-    outline-offset: 1px;
+    outline: none;
+    border-color: color-mix(in srgb, var(--color-brand) 60%, var(--color-line));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 22%, transparent);
   }
 
   .score-input {
-    width: 3rem;
+    width: 3.1rem;
+    height: 3.1rem;
     text-align: center;
     font-family: var(--font-display);
-    font-size: 1.35rem;
+    font-size: 1.45rem;
     font-variant-numeric: tabular-nums;
     background: var(--color-ink2);
     border: 1px solid var(--color-line);
-    border-radius: 0.6rem;
+    border-radius: var(--radius-md);
     color: var(--color-fg);
-    padding: 0.2rem 0;
     -moz-appearance: textfield;
     appearance: textfield;
-    transition: border-color 0.12s var(--ease-out), outline 0.12s var(--ease-out),
-      transform 0.12s var(--ease-out);
+    transition: border-color 0.14s var(--ease-out), box-shadow 0.14s var(--ease-out),
+      transform 0.14s var(--ease-out);
   }
   .score-input::-webkit-outer-spin-button,
   .score-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
+  .score-input:hover {
+    border-color: var(--color-line2);
+  }
   .score-input:focus {
-    outline: 2px solid color-mix(in srgb, var(--color-brand) 75%, transparent);
-    border-color: transparent;
+    outline: none;
+    border-color: color-mix(in srgb, var(--color-brand) 70%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 24%, transparent);
+    transform: translateY(-1px);
   }
 
+  /* Chip / etiqueta -------------------------------------------------- */
   .chip {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.34rem;
     font-size: 0.72rem;
     font-weight: 700;
-    padding: 0.14rem 0.6rem;
-    border-radius: 999px;
+    padding: 0.16rem 0.6rem;
+    border-radius: var(--radius-full);
     border: 1px solid var(--color-line);
     color: var(--color-muted);
-    background: color-mix(in srgb, var(--color-card2) 60%, transparent);
+    background: color-mix(in srgb, var(--color-card2) 55%, transparent);
+    white-space: nowrap;
+  }
+
+  /* Pílula de pontuação (feedback de acerto) ------------------------- */
+  .tier-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: var(--font-display);
+    font-size: 0.82rem;
+    line-height: 1;
+    padding: 0.28rem 0.6rem;
+    border-radius: var(--radius-full);
+    border: 1px solid color-mix(in srgb, currentColor 45%, transparent);
+    background: color-mix(in srgb, currentColor 14%, transparent);
+  }
+
+  /* Distintivo de posição metálico (substitui as medalhas emoji) ----- */
+  .rank-badge {
+    display: inline-grid;
+    place-items: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    flex: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    color: var(--color-muted);
+    background: var(--color-card2);
+    border: 1px solid var(--color-line);
+    box-shadow: var(--shadow-sm);
+  }
+  .rank-1 {
+    color: #3a2900;
+    border-color: transparent;
+    background: linear-gradient(150deg, #ffe9a3 0%, #f2c14e 46%, #c79a2f 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      0 8px 22px -10px rgba(242, 193, 78, 0.75);
+  }
+  .rank-2 {
+    color: #20242e;
+    border-color: transparent;
+    background: linear-gradient(150deg, #f4f6fb 0%, #c7cdda 48%, #9aa1b4 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      0 8px 20px -12px rgba(199, 205, 218, 0.6);
+  }
+  .rank-3 {
+    color: #2a1606;
+    border-color: transparent;
+    background: linear-gradient(150deg, #f0bd8e 0%, #cd7f44 50%, #9c5a26 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      0 8px 20px -12px rgba(205, 127, 68, 0.55);
+  }
+
+  /* Avatar de inicial ------------------------------------------------ */
+  .avatar {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    border-radius: var(--radius-full);
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    color: var(--color-fg);
+    background:
+      radial-gradient(120% 120% at 30% 20%, rgba(255, 255, 255, 0.12), transparent 60%),
+      var(--color-card2);
+    border: 1px solid var(--color-line2);
+  }
+
+  /* Esqueleto (loading) — shimmer suave ------------------------------ */
+  .skeleton {
+    border-radius: var(--radius-md);
+    background: linear-gradient(
+      90deg,
+      var(--color-card) 25%,
+      var(--color-card2) 40%,
+      var(--color-card) 60%
+    );
+    background-size: 300% 100%;
+    animation: shimmer 1.5s ease infinite;
   }
 }
 
-/* Texto com o gradiente quente */
-.brand-text {
-  font-family: var(--font-display);
-  background: var(--grad-festive);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  letter-spacing: 0.005em;
+/* ---------------------------------------------------------------------
+   Superfícies fotográficas e vidro
+   --------------------------------------------------------------------- */
+
+/* Fotografia com tratamento editorial (nunca "stock cru"). A imagem entra
+   por --img (inline style no JSX). */
+.photo {
+  position: absolute;
+  inset: 0;
+  background-image: var(--img);
+  background-size: cover;
+  background-position: var(--img-pos, center);
+  filter: saturate(1.04) contrast(1.05) brightness(0.9);
+  transform: scale(1.04);
+  transition: transform 1.1s var(--ease-out), filter 0.6s ease;
+}
+.photo-wash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 10, 18, 0.25) 0%,
+      rgba(10, 10, 18, 0.6) 56%,
+      var(--color-ink) 100%
+    ),
+    radial-gradient(130% 90% at 50% -10%, transparent 28%, rgba(10, 10, 18, 0.55) 100%);
+}
+.group:hover .photo {
+  transform: scale(1.08);
 }
 
-.display {
-  font-family: var(--font-display);
-  letter-spacing: 0.005em;
-  /* Algarismos de largura fixa: placares e pontuacoes alinham na vertical. */
-  font-variant-numeric: tabular-nums;
+/* Banda fotográfica (cabeçalho de página) */
+.photo-band {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-line);
+  isolation: isolate;
+  box-shadow: var(--shadow-md);
 }
 
-/* Barra fina multicolor no topo */
+/* Vidro (form de login sobre a foto) */
+.glass {
+  background: color-mix(in srgb, var(--color-card) 72%, transparent);
+  border: 1px solid color-mix(in srgb, #ffffff 12%, var(--color-line));
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(22px) saturate(1.2);
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.06) inset, var(--shadow-lg);
+}
+
+/* Faixa fina warm no topo (substitui o arco-íris carnavalesco) */
 .festive-bar {
-  height: 4px;
+  height: 2px;
   width: 100%;
-  background: var(--grad-festive-wide);
-  background-size: 200% 100%;
-  animation: festiveSlide 18s linear infinite;
-}
-@keyframes festiveSlide {
-  to {
-    background-position: 200% 0;
-  }
+  background: var(--grad-bar);
+  background-size: 220% 100%;
+  animation: festiveSlide 16s linear infinite;
 }
 
 /* Emblema: badge laranja + riscas de bandeiras + troféu */
@@ -204,10 +479,11 @@ body {
   position: relative;
   display: inline-grid;
   place-items: center;
-  border-radius: 24%;
-  background: linear-gradient(135deg, #ff9a2e, #ef7d10);
+  border-radius: 26%;
+  background: linear-gradient(140deg, #ff9a2e, #ef7d10);
   overflow: hidden;
-  box-shadow: 0 6px 18px -8px rgba(239, 125, 16, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 8px 20px -8px rgba(239, 125, 16, 0.75);
   flex: none;
 }
 .emblem-badge .stripes {
@@ -216,81 +492,95 @@ body {
   background: repeating-linear-gradient(
     58deg,
     transparent 0 10px,
-    rgba(229, 57, 47, 0.55) 10px 14px,
+    rgba(229, 57, 47, 0.5) 10px 14px,
     transparent 14px 24px,
-    rgba(47, 107, 255, 0.5) 24px 28px,
+    rgba(47, 107, 255, 0.46) 24px 28px,
     transparent 28px 40px,
-    rgba(31, 170, 85, 0.5) 40px 44px,
+    rgba(31, 170, 85, 0.46) 40px 44px,
     transparent 44px 56px,
-    rgba(255, 255, 255, 0.5) 56px 60px,
-    transparent 60px 72px,
-    rgba(0, 0, 0, 0.3) 72px 76px,
-    transparent 76px 88px
+    rgba(255, 255, 255, 0.46) 56px 60px,
+    transparent 60px 72px
   );
-  opacity: 0.55;
+  opacity: 0.5;
 }
 .emblem-badge svg {
   position: relative;
 }
 
-/* Selecao de texto na cor da marca */
-::selection {
-  background: color-mix(in srgb, var(--color-brand) 35%, transparent);
-  color: var(--color-fg);
+/* Escudo/bandeira com aro p/ assentar sobre fundo escuro */
+.crest-ring {
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-card2) 85%, transparent);
+  border: 1px solid var(--color-line);
+  overflow: hidden;
+  flex: none;
 }
 
-/* Entrada em cascata (stagger): cada item surge logo a seguir ao anterior.
-   Comeca a scale(0.98)+opacity em vez de scale(0) — nada no mundo real
-   aparece do nada. Animacao corre uma vez por montagem. */
-@keyframes riseIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.985);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-.stagger > * {
-  opacity: 0;
-  animation: riseIn 0.42s var(--ease-out) forwards;
-}
-.stagger > *:nth-child(1) {
-  animation-delay: 0ms;
-}
-.stagger > *:nth-child(2) {
-  animation-delay: 45ms;
-}
-.stagger > *:nth-child(3) {
-  animation-delay: 90ms;
-}
-.stagger > *:nth-child(4) {
-  animation-delay: 135ms;
-}
-.stagger > *:nth-child(5) {
-  animation-delay: 180ms;
-}
-.stagger > *:nth-child(6) {
-  animation-delay: 225ms;
-}
-.stagger > *:nth-child(n + 7) {
-  animation-delay: 260ms;
+/* Estado "trancado" elegante */
+.locked {
+  display: inline-grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: var(--radius-md);
+  color: var(--color-faint);
+  background: color-mix(in srgb, var(--color-ink2) 85%, transparent);
+  border: 1px solid var(--color-line);
 }
 
-/* Indicador "a decorrer": ponto que pulsa para comunicar estado em direto. */
+/* Pódio da classificação (top 3) */
+.podium {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
+  box-shadow: var(--shadow-md);
+}
+.podium-rank-1 {
+  border-color: color-mix(in srgb, var(--color-gold) 55%, var(--color-line));
+  box-shadow: 0 20px 50px -30px rgba(242, 193, 78, 0.6);
+}
+
+/* Carrossel infinito de seleções ("ambiente Mundial") */
+.rail-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.rail {
+  display: inline-flex;
+  gap: 1.5rem;
+  white-space: nowrap;
+  animation: railSlide 40s linear infinite;
+}
+.rail:hover {
+  animation-play-state: paused;
+}
+
+/* Indicador "a decorrer": ponto que pulsa */
 .live-dot {
   display: inline-block;
   width: 0.5rem;
   height: 0.5rem;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--color-brand);
   box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand) 70%, transparent);
-  animation: livePulse 1.6s var(--ease-in-out) infinite;
+  animation: livePulse 1.7s var(--ease-in-out) infinite;
+}
+
+/* ---------------------------------------------------------------------
+   Animações
+   --------------------------------------------------------------------- */
+@keyframes festiveSlide {
+  to {
+    background-position: 220% 0;
+  }
 }
 @keyframes livePulse {
   0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand) 65%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand) 60%, transparent);
   }
   70% {
     box-shadow: 0 0 0 6px transparent;
@@ -299,10 +589,44 @@ body {
     box-shadow: 0 0 0 0 transparent;
   }
 }
+@keyframes railSlide {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
 
-/* Confirmacao de palpite guardado: surge suavemente. */
+/* Entrada em cascata (stagger): cada item surge logo a seguir ao anterior. */
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(9px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.stagger > * {
+  opacity: 0;
+  animation: riseIn 0.46s var(--ease-out) forwards;
+}
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 50ms; }
+.stagger > *:nth-child(3) { animation-delay: 100ms; }
+.stagger > *:nth-child(4) { animation-delay: 150ms; }
+.stagger > *:nth-child(5) { animation-delay: 200ms; }
+.stagger > *:nth-child(6) { animation-delay: 250ms; }
+.stagger > *:nth-child(7) { animation-delay: 300ms; }
+.stagger > *:nth-child(n + 8) { animation-delay: 340ms; }
+
+/* Confirmação de palpite guardado */
 .saved-flash {
-  animation: savedIn 0.3s var(--ease-out);
+  animation: savedIn 0.34s var(--ease-out);
 }
 @keyframes savedIn {
   from {
@@ -315,113 +639,7 @@ body {
   }
 }
 
-/* Acessibilidade: movimento reduzido = menos e mais suave, nao zero.
-   Mantem fades/cores, remove deslocacoes e o loop infinito da barra. */
-@media (prefers-reduced-motion: reduce) {
-  .stagger > * {
-    opacity: 1;
-    animation: none;
-  }
-  .festive-bar,
-  .live-dot {
-    animation: none;
-  }
-  .saved-flash {
-    animation: none;
-  }
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Realce subtil em titulos de seccao */
-.section-accent {
-  position: relative;
-  padding-left: 0.7rem;
-}
-.section-accent::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.15em;
-  bottom: 0.15em;
-  width: 4px;
-  border-radius: 999px;
-  background: var(--grad-festive);
-}
-
-/* =====================================================================
-   SISTEMA VISUAL — imagens reais do Mundial, motion fluido, profundidade
-   ===================================================================== */
-
-html {
-  scroll-behavior: smooth;
-}
-
-/* --- Fotografia com tratamento (nunca "stock cru") -------------------
-   Camada de imagem + wash escuro p/ legibilidade do texto por cima.
-   A imagem entra por variavel --img (inline style no JSX). */
-.photo {
-  position: absolute;
-  inset: 0;
-  background-image: var(--img);
-  background-size: cover;
-  background-position: var(--img-pos, center);
-  /* dessatura ligeiro + contraste: parece editorial, nao banco de imagens */
-  filter: saturate(1.05) contrast(1.06) brightness(0.92);
-  transform: scale(1.04);
-  transition: transform 1.1s var(--ease-out), filter 0.6s ease;
-}
-.photo-wash::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(11, 11, 21, 0.2) 0%, rgba(11, 11, 21, 0.55) 55%, var(--color-ink) 100%),
-    radial-gradient(120% 80% at 50% 0%, transparent 30%, rgba(11, 11, 21, 0.5) 100%);
-}
-/* leve zoom da foto ao passar o rato no contentor "group" */
-.group:hover .photo {
-  transform: scale(1.09);
-}
-
-/* Banda fotografica fina usada como cabecalho de pagina */
-.photo-band {
-  position: relative;
-  overflow: hidden;
-  border-radius: 1.25rem;
-  border: 1px solid var(--color-line);
-  isolation: isolate;
-}
-
-/* --- Cartoes que reagem (hover physics) ----------------------------- */
-.lift {
-  transition: transform 0.4s var(--ease-out), border-color 0.3s ease,
-    box-shadow 0.45s ease;
-  will-change: transform;
-}
-.lift:hover {
-  transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--color-brand) 55%, var(--color-line));
-  box-shadow:
-    0 26px 60px -32px rgba(245, 144, 30, 0.55),
-    0 10px 30px -18px rgba(0, 0, 0, 0.8);
-}
-
-/* --- Vidro forte (form de login sobre a foto) ----------------------- */
-.glass {
-  background: color-mix(in srgb, var(--color-card) 70%, transparent);
-  border: 1px solid color-mix(in srgb, #ffffff 11%, var(--color-line));
-  border-radius: 1.25rem;
-  backdrop-filter: blur(22px) saturate(1.15);
-  box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
-    0 40px 90px -50px rgba(0, 0, 0, 0.95);
-}
-
-/* --- Revelar ao scroll (IntersectionObserver poe .is-visible) ------- */
+/* Revelar ao scroll (IntersectionObserver põe .is-visible) */
 .reveal {
   opacity: 0;
   transform: translateY(20px);
@@ -433,72 +651,24 @@ html {
   transform: none;
 }
 
-/* --- Podio da classificacao (top 3) --------------------------------- */
-.podium {
-  position: relative;
-  overflow: hidden;
-  border-radius: 1.1rem;
-  border: 1px solid var(--color-line);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
-}
-.podium-rank-1 {
-  border-color: color-mix(in srgb, var(--color-gold) 60%, var(--color-line));
-  box-shadow: 0 20px 50px -30px rgba(242, 193, 78, 0.6);
-}
-.podium-medal {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  line-height: 1;
-}
-
-/* --- Carrossel infinito de selecoes (faixa de "ambiente Mundial") --- */
-.rail-mask {
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-}
-.rail {
-  display: inline-flex;
-  gap: 1.5rem;
-  white-space: nowrap;
-  animation: railSlide 38s linear infinite;
-}
-.rail:hover {
-  animation-play-state: paused;
-}
-@keyframes railSlide {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-/* --- Escudo/bandeira com aro p/ assentar sobre fundo escuro ---------- */
-.crest-ring {
-  display: inline-grid;
-  place-items: center;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--color-card2) 80%, transparent);
-  border: 1px solid var(--color-line);
-  overflow: hidden;
-  flex: none;
-}
-
-/* --- Estado "trancado" elegante (substitui o emoji cadeado cru) ----- */
-.locked {
-  display: inline-grid;
-  place-items: center;
-  width: 2.4rem;
-  height: 2.4rem;
-  border-radius: 0.7rem;
-  color: var(--color-muted);
-  background: color-mix(in srgb, var(--color-ink2) 80%, transparent);
-  border: 1px solid var(--color-line);
-}
-
-/* Movimento reduzido: corta deslocacoes/loops, mantem visibilidade */
+/* ---------------------------------------------------------------------
+   Acessibilidade — movimento reduzido: corta deslocações e loops,
+   mantém visibilidade, fades e cores.
+   --------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  .stagger > * {
+    opacity: 1;
+    animation: none;
+  }
+  .festive-bar,
+  .live-dot,
+  .rail,
+  .saved-flash,
+  .skeleton {
+    animation: none;
   }
   .reveal {
     opacity: 1;
@@ -509,7 +679,23 @@ html {
     transform: none;
     transition: none;
   }
-  .rail {
-    animation: none;
+  .lift:hover {
+    transform: none;
+  }
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Menos transparência: troca o vidro/grão por superfícies sólidas */
+@media (prefers-reduced-transparency: reduce) {
+  body::before {
+    display: none;
+  }
+  .glass {
+    background: color-mix(in srgb, var(--color-card) 96%, transparent);
+    backdrop-filter: none;
   }
 }

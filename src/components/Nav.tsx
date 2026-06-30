@@ -8,6 +8,7 @@ import Emblem from "@/components/Emblem";
 
 type NavUser = { username: string; isAdmin: boolean } | null;
 type LinkDef = { href: string; label: string; icon: IconName };
+type IconName = "palpites" | "calendario" | "classificacao" | "admin";
 
 function NavIcon({ name }: { name: IconName }) {
   const common = {
@@ -52,8 +53,6 @@ function NavIcon({ name }: { name: IconName }) {
   }
 }
 
-type IconName = "palpites" | "calendario" | "classificacao" | "admin";
-
 export default function Nav({ user }: { user: NavUser }) {
   const path = usePathname();
   const router = useRouter();
@@ -79,47 +78,58 @@ export default function Nav({ user }: { user: NavUser }) {
 
   return (
     <>
-      <header className="sticky top-0 z-20 border-b border-line bg-ink/85 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-line/80 bg-ink/80 backdrop-blur-xl">
         <div className="festive-bar" />
-        <div className="max-w-3xl mx-auto px-4 py-2.5 flex items-center gap-3">
+        <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
           <Link
             href={user ? "/palpites" : "/login"}
             className="group shrink-0 flex items-center gap-2"
+            aria-label={SITE_NAME}
           >
-            <span className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+            <span className="transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
               <Emblem size={30} />
             </span>
-            <span className="brand-text text-base sm:text-lg leading-none max-w-[52vw] sm:max-w-none truncate">
+            <span className="brand-text text-base sm:text-lg leading-none max-w-[46vw] sm:max-w-none truncate">
               {SITE_NAME}
             </span>
           </Link>
 
           {/* Links no topo: só em ecrãs maiores */}
           {user && (
-            <nav className="ml-auto hidden sm:flex items-center gap-1">
-              {links.map((l) => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className={`px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-colors ${
-                    isActive(l.href)
-                      ? "bg-card2 text-fg"
-                      : "text-muted hover:text-fg"
-                  }`}
-                >
-                  {l.label}
-                </Link>
-              ))}
+            <nav className="ml-auto hidden sm:flex items-center gap-0.5">
+              {links.map((l) => {
+                const active = isActive(l.href);
+                return (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    aria-current={active ? "page" : undefined}
+                    className={`relative px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+                      active
+                        ? "text-fg"
+                        : "text-muted hover:text-fg hover:bg-card2/50"
+                    }`}
+                  >
+                    {l.label}
+                    {active && (
+                      <span className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-brand" />
+                    )}
+                  </Link>
+                );
+              })}
             </nav>
           )}
 
           {user ? (
-            <div className="flex items-center gap-2 shrink-0 ml-auto sm:ml-0">
+            <div className="flex items-center gap-2.5 shrink-0 ml-auto sm:ml-2">
               <Link
                 href={`/perfil/${user.username}`}
-                className="hidden sm:inline text-sm text-muted hover:text-fg"
+                className="hidden sm:flex items-center gap-2 text-sm text-muted hover:text-fg transition-colors"
               >
-                @{user.username}
+                <span className="avatar h-7 w-7 text-xs">
+                  {user.username.charAt(0)}
+                </span>
+                <span className="max-w-[12ch] truncate">{user.username}</span>
               </Link>
               <button
                 onClick={logout}
@@ -130,7 +140,10 @@ export default function Nav({ user }: { user: NavUser }) {
               </button>
             </div>
           ) : (
-            <Link href="/login" className="ml-auto btn btn-primary text-sm py-1.5">
+            <Link
+              href="/login"
+              className="ml-auto btn btn-primary text-sm py-1.5 px-4"
+            >
               Entrar
             </Link>
           )}
@@ -139,17 +152,24 @@ export default function Nav({ user }: { user: NavUser }) {
 
       {/* Barra inferior: só no telemóvel */}
       {user && (
-        <nav className="sm:hidden fixed bottom-0 inset-x-0 z-30 border-t border-line bg-ink/90 backdrop-blur flex">
+        <nav
+          className="sm:hidden fixed bottom-0 inset-x-0 z-40 border-t border-line/80 bg-ink/90 backdrop-blur-xl flex"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
           {links.map((l) => {
             const active = isActive(l.href);
             return (
               <Link
                 key={l.href}
                 href={l.href}
-                className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-[0.68rem] font-semibold ${
-                  active ? "text-brand" : "text-muted"
+                aria-current={active ? "page" : undefined}
+                className={`relative flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[0.68rem] font-semibold transition-colors ${
+                  active ? "text-brand" : "text-faint"
                 }`}
               >
+                {active && (
+                  <span className="absolute top-0 h-0.5 w-8 rounded-full bg-brand" />
+                )}
                 <NavIcon name={l.icon} />
                 {l.label}
               </Link>

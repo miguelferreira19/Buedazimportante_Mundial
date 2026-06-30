@@ -37,27 +37,48 @@ export default async function JogoPage({
 
   return (
     <div className="space-y-5">
-      <Link href="/calendario" className="text-sm text-muted hover:text-fg">
-        ← Voltar ao calendário
+      <Link
+        href="/calendario"
+        className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-fg transition-colors"
+      >
+        <span aria-hidden>←</span> Calendário
       </Link>
 
       <MatchRow m={match} />
 
-      <h2 className="display text-xl section-accent">Palpites de toda a gente</h2>
+      <h2 className="display text-lg section-accent">Palpites de toda a gente</h2>
 
       {!started ? (
-        <div className="card p-6 text-sm text-muted leading-relaxed">
-          🔒 Os palpites de toda a gente ficam visíveis{" "}
-          <strong className="text-fg">quando o jogo começar</strong> — assim
-          ninguém é influenciado pelas escolhas dos outros.
+        <div className="card p-7 text-center">
+          <span className="locked mx-auto mb-3">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+          </span>
+          <p className="display text-base">Palpites fechados até ao apito</p>
+          <p className="text-sm text-muted mt-1.5 max-w-sm mx-auto leading-relaxed">
+            Os palpites de toda a gente ficam visíveis quando o jogo começar.
+            Assim ninguém é influenciado pelas escolhas dos outros.
+          </p>
         </div>
       ) : preds.length === 0 ? (
-        <div className="card p-6 text-sm text-muted">
-          Ninguém palpitou este jogo.
+        <div className="card p-7 text-center">
+          <p className="display text-base">Ninguém palpitou este jogo</p>
+          <p className="text-sm text-muted mt-1.5">Ficou sem apostas.</p>
         </div>
       ) : (
-        <div className="card divide-y divide-line/50">
-          {preds.map((p) => {
+        <ul className="card divide-y divide-line/40 p-0 overflow-hidden">
+          {preds.map((p, i) => {
             const tier = finished
               ? scoreTier(
                   { home: p.pred_home, away: p.pred_away },
@@ -65,13 +86,19 @@ export default async function JogoPage({
                 )
               : null;
             return (
-              <div
+              <li
                 key={p.username}
-                className="flex items-center justify-between gap-2 px-3 py-2.5"
+                className="flex items-center gap-3 px-4 py-3"
               >
+                <span className="text-xs text-faint tabular-nums w-4 shrink-0">
+                  {i + 1}
+                </span>
+                <span aria-hidden className="avatar h-8 w-8 text-xs">
+                  {p.username.charAt(0)}
+                </span>
                 <Link
                   href={`/perfil/${p.username}`}
-                  className="font-semibold hover:text-brand truncate"
+                  className="font-semibold hover:text-brand truncate flex-1 transition-colors"
                 >
                   {p.username}
                 </Link>
@@ -80,9 +107,9 @@ export default async function JogoPage({
                     {p.pred_home}×{p.pred_away}
                   </span>
                   {tier ? (
-                    <span className={`display ${TIER_CLASS[tier]}`}>
+                    <span className={`tier-pill ${TIER_CLASS[tier]}`}>
                       +{SCORING[tier]}
-                      <span className="text-xs ml-1 hidden sm:inline">
+                      <span className="text-xs font-normal opacity-80 hidden sm:inline">
                         {TIER_LABEL[tier]}
                       </span>
                     </span>
@@ -90,10 +117,10 @@ export default async function JogoPage({
                     <span className="chip">a decorrer</span>
                   )}
                 </div>
-              </div>
+              </li>
             );
           })}
-        </div>
+        </ul>
       )}
     </div>
   );

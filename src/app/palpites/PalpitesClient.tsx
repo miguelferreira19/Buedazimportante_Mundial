@@ -60,6 +60,17 @@ export default function PalpitesClient({
 
   const visibleDays = days.filter(([k]) => showPast || k >= todayKey);
 
+  // Quantos jogos abertos ainda sem palpite (foco da pagina).
+  const openNoPred = useMemo(() => {
+    return matches.filter(
+      (m) =>
+        !hasStarted(m.kickoff_utc, now) &&
+        m.home_name &&
+        m.away_name &&
+        !saved[m.id],
+    ).length;
+  }, [matches, now, saved]);
+
   // Proximo jogo a comecar (para o cabecalho).
   const nextMatch = useMemo(() => {
     const up = matches
@@ -123,82 +134,67 @@ export default function PalpitesClient({
 
   if (matches.length === 0) {
     return (
-      <div className="card p-6 text-sm text-muted">
-        Ainda não há jogos carregados. O administrador precisa de sincronizar o
-        calendário no painel de Admin.
+      <div className="space-y-6">
+        <Hero next={null} openCount={0} now={now} />
+        <EmptyCard
+          title="Ainda não há jogos"
+          body="O calendário ainda não foi sincronizado. Assim que o administrador o carregar, os jogos aparecem aqui."
+        />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Cabecalho fotografico: relvado lotado + proximo jogo */}
-      <header className="photo-band group">
-        <div
-          className="photo photo-wash"
-          style={{ "--img": "url(/img/pitch-day.jpg)" } as React.CSSProperties}
-        />
-        <div className="relative z-10 p-5 sm:p-7">
-          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.26em] text-gold/90">
-            Mundial 2026
-          </p>
-          <h1
-            className="display mt-1 leading-[1.05]"
-            style={{ fontSize: "clamp(1.9rem, 5.4vw, 2.8rem)" }}
-          >
-            Os teus palpites
-          </h1>
-          {nextMatch && (
-            <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-              <span className="chip border-brand/40 text-brand">
-                <span className="live-dot" /> a seguir
-              </span>
-              <span className="flex items-center gap-2 font-semibold">
-                <Crest src={nextMatch.home_crest} alt="" size={18} />
-                {nextMatch.home_name ?? "A definir"}
-                <span className="text-muted">×</span>
-                {nextMatch.away_name ?? "A definir"}
-                <Crest src={nextMatch.away_crest} alt="" size={18} />
-              </span>
-              <span className="text-muted">
-                {countdown(nextMatch.kickoff_utc, now)}
-              </span>
-            </div>
-          )}
-        </div>
-      </header>
+      <Hero next={nextMatch} openCount={openNoPred} now={now} />
 
-      <label className="card flex items-center justify-between gap-3 px-4 py-2.5 text-sm cursor-pointer select-none">
-        <span className="text-muted">Mostrar também os jogos já passados</span>
-        <input
-          type="checkbox"
-          className="accent-brand h-4 w-4"
-          checked={showPast}
-          onChange={(e) => setShowPast(e.target.checked)}
-        />
-      </label>
+      {/* Filtro: por jogar / tudo */}
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm text-faint">
+          {visibleDays.reduce((n, [, l]) => n + l.length, 0)} jogos
+        </p>
+        <div className="inline-flex rounded-full border border-line bg-card2/40 p-0.5 text-sm">
+          {[
+            { v: false, label: "Por jogar" },
+            { v: true, label: "Tudo" },
+          ].map((o) => (
+            <button
+              key={String(o.v)}
+              onClick={() => setShowPast(o.v)}
+              aria-pressed={showPast === o.v}
+              className={`px-3.5 py-1 rounded-full font-medium transition-colors ${
+                showPast === o.v
+                  ? "bg-card2 text-fg shadow-sm"
+                  : "text-muted hover:text-fg"
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {visibleDays.length === 0 && (
-        <div className="card p-6 text-sm text-muted">
-          Não há jogos próximos. Ativa “mostrar jogos passados” para rever os
-          anteriores.
-        </div>
+        <EmptyCard
+          title="Sem jogos por jogar"
+          body="Estás em dia com os palpites. Carrega em “Tudo” para rever os jogos anteriores."
+        />
       )}
 
       {visibleDays.map(([k, list]) => (
-        <section key={k} className="space-y-2">
-          <h2
-            className={`display text-lg sticky top-[57px] py-1 bg-ink/80 backdrop-blur ${
-              k === todayKey ? "text-brand" : "text-fg"
-            }`}
-          >
-            {fmtDayLabel(list[0].kickoff_utc)}
-            {k === todayKey && (
-              <span className="chip ml-2 align-middle">Hoje</span>
-            )}
-          </h2>
+        <section key={k} className="space-y-2.5">
+          <div className="sticky top-[58px] z-10 -mx-1 px-1 py-1.5 bg-ink/85 backdrop-blur">
+            <h2
+              className={`display text-lg flex items-center gap-2 ${
+                k === todayKey ? "text-brand" : "text-fg"
+              }`}
+            >
+              {fmtDayLabel(list[0].kickoff_utc)}
+              {k === todayKey && <span className="chip">Hoje</span>}
+            </h2>
+          </div>
 
-          <div className="space-y-2 stagger">
+          <div className="space-y-2.5 stagger">
             {list.map((m) => {
               const started = hasStarted(m.kickoff_utc, now);
               const finished = m.status === "finished";
@@ -206,6 +202,7 @@ export default function PalpitesClient({
               const p = preds[m.id];
               const sv = saved[m.id];
               const st = state[m.id] ?? "idle";
+              const open = !started && teamsKnown;
 
               let tier: ScoreTier | null = null;
               if (finished && sv && m.home_score != null && m.away_score != null) {
@@ -216,9 +213,16 @@ export default function PalpitesClient({
               }
 
               return (
-                <div key={m.id} className="card lift p-3">
-                  <div className="flex items-center justify-between text-xs text-muted mb-2">
-                    <span className="truncate">
+                <div
+                  key={m.id}
+                  className={`card lift p-3.5 ${
+                    open && !sv
+                      ? "border-brand/25"
+                      : ""
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs text-faint mb-2.5">
+                    <span className="truncate font-medium uppercase tracking-wide">
                       {m.grp ?? m.stage ?? ""}
                       {m.matchday && m.grp ? ` · J${m.matchday}` : ""}
                     </span>
@@ -228,22 +232,24 @@ export default function PalpitesClient({
                           <span className="live-dot" /> a decorrer
                         </span>
                       )}
-                      <span>{fmtTime(m.kickoff_utc)}</span>
+                      <span className="tabular-nums">
+                        {fmtTime(m.kickoff_utc)}
+                      </span>
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2.5">
                     {/* Casa */}
-                    <div className="flex items-center gap-2 min-w-0 justify-end text-right">
+                    <div className="flex items-center gap-2.5 min-w-0 justify-end text-right">
                       <span className="truncate font-semibold">
                         {m.home_name ?? "A definir"}
                       </span>
-                      <Crest src={m.home_crest} alt={m.home_name ?? ""} />
+                      <Crest src={m.home_crest} alt={m.home_name ?? ""} size={28} />
                     </div>
 
                     {/* Centro: inputs ou resultado */}
                     <div className="flex items-center gap-1.5 justify-center">
-                      {!started && teamsKnown ? (
+                      {open ? (
                         <>
                           <input
                             className="score-input"
@@ -254,7 +260,7 @@ export default function PalpitesClient({
                             }
                             aria-label={`Golos ${m.home_name}`}
                           />
-                          <span className="text-muted">×</span>
+                          <span className="text-faint text-sm">×</span>
                           <input
                             className="score-input"
                             inputMode="numeric"
@@ -266,8 +272,12 @@ export default function PalpitesClient({
                           />
                         </>
                       ) : finished ? (
-                        <div className="display text-2xl px-2">
-                          {m.home_score} × {m.away_score}
+                        <div className="display text-2xl px-2 text-fg">
+                          {m.home_score}
+                          <span className="text-faint mx-1 text-base font-normal">
+                            ×
+                          </span>
+                          {m.away_score}
                         </div>
                       ) : (
                         <span
@@ -276,8 +286,8 @@ export default function PalpitesClient({
                           title="Palpites fechados"
                         >
                           <svg
-                            width="16"
-                            height="16"
+                            width="17"
+                            height="17"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -293,8 +303,8 @@ export default function PalpitesClient({
                     </div>
 
                     {/* Fora */}
-                    <div className="flex items-center gap-2 min-w-0">
-                      <Crest src={m.away_crest} alt={m.away_name ?? ""} />
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <Crest src={m.away_crest} alt={m.away_name ?? ""} size={28} />
                       <span className="truncate font-semibold">
                         {m.away_name ?? "A definir"}
                       </span>
@@ -302,13 +312,13 @@ export default function PalpitesClient({
                   </div>
 
                   {/* Rodapé: guardar OU palpite/resultado */}
-                  <div className="mt-2 flex items-center justify-between gap-2 min-h-[2rem]">
-                    {!started && teamsKnown ? (
+                  <div className="mt-2.5 pt-2.5 border-t border-line/50 flex items-center justify-between gap-2 min-h-[2.25rem]">
+                    {open ? (
                       <>
-                        <span className="text-xs text-muted">
+                        <span className="text-xs text-faint">
                           {countdown(m.kickoff_utc, now)}
                           {st === "saved" && !isDirty(m.id) && (
-                            <span className="text-good ml-2 saved-flash">
+                            <span className="text-good ml-2 saved-flash font-semibold">
                               ✓ guardado
                             </span>
                           )}
@@ -317,7 +327,7 @@ export default function PalpitesClient({
                           )}
                         </span>
                         <button
-                          className="btn btn-primary text-sm py-1.5 px-3"
+                          className="btn btn-primary text-sm py-1.5 px-3.5"
                           disabled={st === "saving" || !isDirty(m.id)}
                           onClick={() => save(m.id)}
                         >
@@ -331,22 +341,32 @@ export default function PalpitesClient({
                     ) : (
                       <div className="flex items-center justify-between w-full text-sm gap-2">
                         <span className="text-muted truncate">
-                          {sv
-                            ? `O teu palpite: ${sv.home}×${sv.away}`
-                            : teamsKnown
-                              ? "Sem palpite"
-                              : "Equipas por definir"}
+                          {sv ? (
+                            <>
+                              O teu palpite{" "}
+                              <span className="display text-fg">
+                                {sv.home}×{sv.away}
+                              </span>
+                            </>
+                          ) : teamsKnown ? (
+                            "Sem palpite"
+                          ) : (
+                            "Equipas por definir"
+                          )}
                         </span>
                         <div className="flex items-center gap-3 shrink-0">
                           {tier && (
-                            <span className={`display ${TIER_CLASS[tier]}`}>
-                              +{SCORING[tier]} · {TIER_LABEL[tier]}
+                            <span className={`tier-pill ${TIER_CLASS[tier]}`}>
+                              +{SCORING[tier]}
+                              <span className="hidden sm:inline font-normal opacity-80">
+                                {TIER_LABEL[tier]}
+                              </span>
                             </span>
                           )}
                           {started && (
                             <Link
                               href={`/jogo/${m.id}`}
-                              className="text-brand hover:underline whitespace-nowrap"
+                              className="text-brand hover:underline whitespace-nowrap font-medium"
                             >
                               ver palpites →
                             </Link>
@@ -361,6 +381,71 @@ export default function PalpitesClient({
           </div>
         </section>
       ))}
+    </div>
+  );
+}
+
+/* Cabecalho fotografico unico da pagina de palpites. */
+function Hero({
+  next,
+  openCount,
+  now,
+}: {
+  next: DbMatch | null;
+  openCount: number;
+  now: number;
+}) {
+  return (
+    <header className="photo-band group">
+      <div
+        className="photo photo-wash"
+        style={{ "--img": "url(/img/pitch-day.jpg)" } as React.CSSProperties}
+      />
+      <div className="relative z-10 p-5 sm:p-7">
+        <p className="eyebrow">Mundial 2026</p>
+        <h1 className="h-page mt-1.5">Os teus palpites</h1>
+        <p className="text-muted text-sm mt-2 max-w-md leading-relaxed">
+          {openCount > 0 ? (
+            <>
+              Tens{" "}
+              <span className="text-fg font-semibold">{openCount}</span>{" "}
+              {openCount === 1 ? "jogo por palpitar" : "jogos por palpitar"}.
+              Cada um fecha no apito inicial.
+            </>
+          ) : (
+            "Mete o resultado de cada jogo. Cada um fecha no apito inicial."
+          )}
+        </p>
+
+        {next && (
+          <div className="mt-4 inline-flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl border border-line/70 bg-ink3/50 backdrop-blur px-3 py-2 text-sm">
+            <span className="chip border-brand/40 text-brand">
+              <span className="live-dot" /> a seguir
+            </span>
+            <span className="flex items-center gap-2 font-semibold">
+              <Crest src={next.home_crest} alt="" size={20} />
+              {next.home_name ?? "A definir"}
+              <span className="text-faint">×</span>
+              {next.away_name ?? "A definir"}
+              <Crest src={next.away_crest} alt="" size={20} />
+            </span>
+            <span className="text-faint tabular-nums">
+              {countdown(next.kickoff_utc, now)}
+            </span>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}
+
+function EmptyCard({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="card p-7 text-center">
+      <p className="display text-lg text-fg">{title}</p>
+      <p className="text-sm text-muted mt-1.5 max-w-sm mx-auto leading-relaxed">
+        {body}
+      </p>
     </div>
   );
 }

@@ -22,7 +22,13 @@ export type FdMatch = {
   matchday: number | null;
   homeTeam: FdTeam | null;
   awayTeam: FdTeam | null;
-  score?: { fullTime?: { home: number | null; away: number | null } };
+  score?: {
+    fullTime?: { home: number | null; away: number | null };
+    // Em jogos a eliminar, "regularTime" tem o resultado dos 90 min (sem
+    // prolongamento nem grandes penalidades). So vem preenchido quando houve
+    // prolongamento/penaltis; nos jogos normais nao existe.
+    regularTime?: { home: number | null; away: number | null };
+  };
 };
 
 export function isFootballDataConfigured(): boolean {
@@ -161,7 +167,10 @@ function mapStatus(s: string, hasScore: boolean): MatchStatus {
 }
 
 export function mapFdMatch(m: FdMatch): Omit<DbMatch, "updated_at"> {
-  const ft = m.score?.fullTime ?? { home: null, away: null };
+  // O "fullTime" da football-data.org SOMA prolongamento + grandes penalidades.
+  // So queremos o resultado dos 90 min => usar "regularTime" quando existe (jogo
+  // a eliminar que foi a prolongamento/penaltis); senao "fullTime" ja sao os 90 min.
+  const ft = m.score?.regularTime ?? m.score?.fullTime ?? { home: null, away: null };
   const hasScore = ft.home != null && ft.away != null;
   const status = mapStatus(m.status, hasScore);
   return {

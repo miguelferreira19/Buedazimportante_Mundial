@@ -6,6 +6,7 @@ import { getMatchById, getMatchPredictions } from "@/lib/queries";
 import SetupNotice from "@/components/SetupNotice";
 import MatchRow from "@/components/MatchRow";
 import Reveal from "@/components/Reveal";
+import TimesX from "@/components/TimesX";
 import { hasStarted } from "@/lib/format";
 import { scoreTier, resultOf, SCORING } from "@/lib/scoring";
 import { TIER_LABEL, TIER_CLASS } from "@/lib/tiers";
@@ -173,8 +174,10 @@ export default async function JogoPage({
                   {p.username}
                 </Link>
                 <div className="flex items-center gap-3 shrink-0 text-sm">
-                  <span className="display text-fg">
-                    {p.pred_home}×{p.pred_away}
+                  <span className="display text-fg inline-flex items-center">
+                    {p.pred_home}
+                    <TimesX className="text-fg" />
+                    {p.pred_away}
                   </span>
                   {tier ? (
                     <span className={`tier-pill ${TIER_CLASS[tier]}`}>

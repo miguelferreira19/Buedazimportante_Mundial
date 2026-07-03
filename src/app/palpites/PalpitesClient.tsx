@@ -8,6 +8,7 @@ import { scoreTier, SCORING, type ScoreTier } from "@/lib/scoring";
 import { TIER_LABEL, TIER_CLASS } from "@/lib/tiers";
 import Crest from "@/components/Crest";
 import TeamName from "@/components/TeamName";
+import TimesX from "@/components/TimesX";
 
 type PredInput = { home: string; away: string };
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -307,7 +308,7 @@ export default function PalpitesClient({
                             }
                             aria-label={`Golos ${m.home_name}`}
                           />
-                          <span className="text-faint text-sm">×</span>
+                          <TimesX className="text-faint text-sm" />
                           <input
                             className={`score-input ${isHero ? "score-input-lg" : ""}`}
                             inputMode="numeric"
@@ -319,11 +320,9 @@ export default function PalpitesClient({
                           />
                         </>
                       ) : finished ? (
-                        <div className="display text-2xl px-2 text-fg">
+                        <div className="display text-2xl px-2 text-fg inline-flex items-center">
                           {m.home_score}
-                          <span className="text-faint mx-1 text-base font-normal">
-                            ×
-                          </span>
+                          <TimesX className="text-faint text-base font-normal" />
                           {m.away_score}
                         </div>
                       ) : (
@@ -406,8 +405,10 @@ export default function PalpitesClient({
                           {sv ? (
                             <>
                               O teu palpite{" "}
-                              <span className="display text-fg">
-                                {sv.home}×{sv.away}
+                              <span className="display text-fg inline-flex items-center">
+                                {sv.home}
+                                <TimesX className="text-fg" />
+                                {sv.away}
                               </span>
                             </>
                           ) : teamsKnown ? (
@@ -487,7 +488,7 @@ function Hero({
             <span className="flex items-center gap-2 font-semibold">
               <Crest src={next.home_crest} alt="" size={20} />
               {next.home_name ?? "A definir"}
-              <span className="text-faint">×</span>
+              <TimesX className="text-faint" />
               {next.away_name ?? "A definir"}
               <Crest src={next.away_crest} alt="" size={20} />
             </span>

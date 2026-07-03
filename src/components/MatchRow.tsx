@@ -1,5 +1,6 @@
 import Crest from "./Crest";
 import TeamName from "./TeamName";
+import TimesX from "./TimesX";
 import { fmtTime } from "@/lib/format";
 import type { DbMatch } from "@/lib/types";
 
@@ -48,9 +49,9 @@ export default function MatchRow({
           }`}
         >
           {finished ? (
-            <span>
+            <span className="inline-flex items-center">
               {m.home_score}
-              <span className="text-faint mx-1 font-normal">×</span>
+              <TimesX className="text-faint text-base font-normal" />
               {m.away_score}
             </span>
           ) : (

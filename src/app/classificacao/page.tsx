@@ -6,6 +6,7 @@ import { getLeaderboard } from "@/lib/queries";
 import SetupNotice from "@/components/SetupNotice";
 import CountUp from "@/components/CountUp";
 import Reveal from "@/components/Reveal";
+import RankDelta from "@/components/RankDelta";
 
 export const dynamic = "force-dynamic";
 
@@ -78,14 +79,17 @@ export default async function ClassificacaoPage() {
                         className="min-w-0 flex-1 hover:text-brand transition-colors"
                       >
                         <span
-                          className={`font-bold truncate block ${lead ? "text-lg" : ""}`}
+                          className={`flex items-center gap-1.5 ${lead ? "text-lg" : ""}`}
                         >
-                          {r.username}
-                          {me && (
-                            <span className="text-xs text-muted font-normal ml-1">
-                              (tu)
-                            </span>
-                          )}
+                          <span className="font-bold truncate">
+                            {r.username}
+                            {me && (
+                              <span className="text-xs text-muted font-normal ml-1">
+                                (tu)
+                              </span>
+                            )}
+                          </span>
+                          <RankDelta username={r.username} rank={i + 1} />
                         </span>
                         <span className="text-[0.7rem] text-faint">
                           {r.exactos} exatos · {r.jogados} jogos
@@ -136,12 +140,15 @@ export default async function ClassificacaoPage() {
                         >
                           {r.username.charAt(0)}
                         </span>
-                        <span
-                          className={`font-bold truncate max-w-[8rem] group-hover:text-brand transition-colors ${
-                            rank === 1 ? "text-base" : "text-sm"
-                          }`}
-                        >
-                          {r.username}
+                        <span className="flex items-center gap-1 min-w-0">
+                          <span
+                            className={`font-bold truncate max-w-[7rem] group-hover:text-brand transition-colors ${
+                              rank === 1 ? "text-base" : "text-sm"
+                            }`}
+                          >
+                            {r.username}
+                          </span>
+                          <RankDelta username={r.username} rank={rank} />
                         </span>
                       </Link>
                       {me && (
@@ -196,17 +203,20 @@ export default async function ClassificacaoPage() {
                       <span className="display text-muted tabular-nums">
                         {i + 4}
                       </span>
-                      <Link
-                        href={`/perfil/${r.username}`}
-                        className="hover:text-brand font-semibold truncate transition-colors"
-                      >
-                        {r.username}
-                        {me && (
-                          <span className="text-xs text-muted font-normal ml-1">
-                            (tu)
-                          </span>
-                        )}
-                      </Link>
+                      <span className="flex items-center gap-1.5 min-w-0">
+                        <Link
+                          href={`/perfil/${r.username}`}
+                          className="hover:text-brand font-semibold truncate transition-colors"
+                        >
+                          {r.username}
+                          {me && (
+                            <span className="text-xs text-muted font-normal ml-1">
+                              (tu)
+                            </span>
+                          )}
+                        </Link>
+                        <RankDelta username={r.username} rank={i + 4} />
+                      </span>
                       <span className="text-right text-muted tabular-nums hidden sm:block">
                         {r.exactos}
                       </span>

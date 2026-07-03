@@ -40,18 +40,11 @@ export const metadata: Metadata = {
     title: SITE_NAME,
     description: DESCRIPTION,
     url: "/",
-    images: [
-      {
-        url: "/img/hero-stadium.jpg",
-        alt: "Bolão do Mundial 2026 entre amigos",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: SITE_NAME,
     description: DESCRIPTION,
-    images: ["/img/hero-stadium.jpg"],
   },
 };
 

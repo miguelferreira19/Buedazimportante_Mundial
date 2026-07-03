@@ -5,8 +5,9 @@ import { isDbConfigured } from "@/lib/db";
 import { getMatchById, getMatchPredictions } from "@/lib/queries";
 import SetupNotice from "@/components/SetupNotice";
 import MatchRow from "@/components/MatchRow";
+import Reveal from "@/components/Reveal";
 import { hasStarted } from "@/lib/format";
-import { scoreTier, SCORING } from "@/lib/scoring";
+import { scoreTier, resultOf, SCORING } from "@/lib/scoring";
 import { TIER_LABEL, TIER_CLASS } from "@/lib/tiers";
 
 export const dynamic = "force-dynamic";
@@ -35,6 +36,28 @@ export default async function JogoPage({
     match.away_score != null;
   const preds = started ? await getMatchPredictions(matchId) : [];
 
+  // Consenso: distribuição de resultados (casa/empate/fora) e placar mais comum.
+  const total = preds.length;
+  const outcomeCounts = { H: 0, D: 0, A: 0 };
+  const scoreCounts = new Map<string, number>();
+  for (const p of preds) {
+    outcomeCounts[resultOf({ home: p.pred_home, away: p.pred_away })] += 1;
+    const key = `${p.pred_home}×${p.pred_away}`;
+    scoreCounts.set(key, (scoreCounts.get(key) ?? 0) + 1);
+  }
+  const pct = (n: number) => (total > 0 ? Math.round((n / total) * 100) : 0);
+  const homePct = pct(outcomeCounts.H);
+  const drawPct = pct(outcomeCounts.D);
+  const awayPct = pct(outcomeCounts.A);
+  let modeScore = "";
+  let modeCount = 0;
+  for (const [key, count] of scoreCounts) {
+    if (count > modeCount) {
+      modeScore = key;
+      modeCount = count;
+    }
+  }
+
   return (
     <div className="space-y-5">
       <Link
@@ -45,6 +68,50 @@ export default async function JogoPage({
       </Link>
 
       <MatchRow m={match} />
+
+      {total > 0 && (
+        <Reveal>
+          <div className="card p-4 sm:p-5 space-y-3">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <h2 className="display text-base section-accent">Consenso</h2>
+              {modeCount > 0 && (
+                <span className="chip">
+                  {modeCount} {modeCount === 1 ? "pessoa diz" : "pessoas dizem"}{" "}
+                  <span className="text-fg font-bold">{modeScore}</span>
+                </span>
+              )}
+            </div>
+            <div className="flex h-2.5 rounded-full overflow-hidden border border-line bg-ink2">
+              <div
+                className="consensus-bar-fill bg-brand"
+                style={{ width: `${homePct}%` }}
+              />
+              <div
+                className="consensus-bar-fill bg-line2"
+                style={{ width: `${drawPct}%` }}
+              />
+              <div
+                className="consensus-bar-fill bg-cyan"
+                style={{ width: `${awayPct}%` }}
+              />
+            </div>
+            <div className="grid grid-cols-3 text-[0.68rem] text-faint">
+              <span className="flex items-center gap-1.5">
+                <span aria-hidden className="h-2 w-2 rounded-full bg-brand shrink-0" />
+                Casa {homePct}%
+              </span>
+              <span className="flex items-center gap-1.5 justify-center">
+                <span aria-hidden className="h-2 w-2 rounded-full bg-line2 shrink-0" />
+                Empate {drawPct}%
+              </span>
+              <span className="flex items-center gap-1.5 justify-end text-right">
+                <span aria-hidden className="h-2 w-2 rounded-full bg-cyan shrink-0" />
+                Fora {awayPct}%
+              </span>
+            </div>
+          </div>
+        </Reveal>
+      )}
 
       <h2 className="display text-lg section-accent">Palpites de toda a gente</h2>
 
@@ -85,10 +152,13 @@ export default async function JogoPage({
                   { home: match.home_score!, away: match.away_score! },
                 )
               : null;
+            const exact = tier === "exact";
             return (
               <li
                 key={p.username}
-                className="flex items-center gap-3 px-4 py-3"
+                className={`flex items-center gap-3 px-4 py-3 ${
+                  exact ? "bg-gold/[0.05] border-l-2 border-gold pl-[calc(1rem-2px)]" : ""
+                }`}
               >
                 <span className="text-xs text-faint tabular-nums w-4 shrink-0">
                   {i + 1}

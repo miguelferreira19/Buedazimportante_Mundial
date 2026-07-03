@@ -553,6 +553,17 @@ body::before {
   );
 }
 
+/* Barra de consenso (página de jogo): cada segmento cresce da esquerda ao
+   entrar no ecrã, acionado pelo .reveal do ancestral (sem JS novo). */
+.consensus-bar-fill {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.8s var(--ease-out);
+}
+.reveal.is-visible .consensus-bar-fill {
+  transform: scaleX(1);
+}
+
 /* Pódio da classificação (top 3) */
 .podium {
   position: relative;
@@ -755,6 +766,10 @@ body::before {
   .reveal {
     opacity: 1;
     transform: none;
+    transition: none;
+  }
+  .consensus-bar-fill {
+    transform: scaleX(1);
     transition: none;
   }
   .photo {

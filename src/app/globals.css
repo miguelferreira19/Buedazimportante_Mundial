@@ -509,6 +509,40 @@ body::before {
   animation: festiveSlide 16s linear infinite;
 }
 
+/* Header encolhe nos primeiros ~120px de scroll (56px -> 48px) e a
+   festive-bar esconde-se; ganho de espaço vertical em mobile. Sem
+   suporte a scroll-timeline, fica estático (sem efeito). */
+@supports (animation-timeline: scroll()) {
+  .site-header-inner {
+    animation: headerShrink linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0px 120px;
+  }
+  .festive-bar {
+    animation: festiveSlide 16s linear infinite, festiveBarHide linear both;
+    animation-timeline: auto, scroll(root);
+    animation-range: normal, 0px 80px;
+  }
+}
+@keyframes headerShrink {
+  from {
+    height: 3.5rem;
+  }
+  to {
+    height: 3rem;
+  }
+}
+@keyframes festiveBarHide {
+  from {
+    opacity: 1;
+    height: 2px;
+  }
+  to {
+    opacity: 0;
+    height: 0px;
+  }
+}
+
 /* Emblema: badge laranja + riscas de bandeiras + troféu */
 .emblem-badge {
   position: relative;
@@ -805,7 +839,8 @@ body::before {
     transform: none;
     transition: none;
   }
-  .login-hero-photo {
+  .login-hero-photo,
+  .site-header-inner {
     animation: none;
   }
   .lift:hover {

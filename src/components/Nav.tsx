@@ -80,7 +80,7 @@ export default function Nav({ user }: { user: NavUser }) {
     <>
       <header className="sticky top-0 z-30 border-b border-line/80 bg-ink/80 backdrop-blur-xl">
         <div className="festive-bar" />
-        <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
+        <div className="site-header-inner max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
           <Link
             href={user ? "/palpites" : "/login"}
             className="group shrink-0 flex items-center gap-2"

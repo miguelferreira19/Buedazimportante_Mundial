@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { isDbConfigured } from "@/lib/db";
@@ -11,6 +12,27 @@ import { scoreTier, SCORING, type ScoreTier } from "@/lib/scoring";
 import { TIER_LABEL, TIER_CLASS } from "@/lib/tiers";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}): Promise<Metadata> {
+  if (!isDbConfigured()) return {};
+  const { username } = await params;
+  const target = await getUserByUsername(decodeURIComponent(username));
+  if (!target) return {};
+
+  const title = target.username;
+  const description = `Perfil e histórico de palpites de ${target.username}.`;
+
+  return {
+    title,
+    description,
+    openGraph: { title, description },
+    twitter: { title, description },
+  };
+}
 
 // Cor de fundo de cada tier na faixa "Forma" (mesma semântica de TIER_CLASS).
 const TIER_BG: Record<ScoreTier, string> = {

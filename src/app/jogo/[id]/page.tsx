@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "@/lib/session";
@@ -12,6 +13,31 @@ import { scoreTier, resultOf, SCORING } from "@/lib/scoring";
 import { TIER_LABEL, TIER_CLASS } from "@/lib/tiers";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  if (!isDbConfigured()) return {};
+  const { id } = await params;
+  const matchId = Number(id);
+  if (!Number.isInteger(matchId)) return {};
+  const match = await getMatchById(matchId);
+  if (!match) return {};
+
+  const home = match.home_code ?? match.home_name ?? "?";
+  const away = match.away_code ?? match.away_name ?? "?";
+  const title = `${home} × ${away}`;
+  const description = `Palpites de toda a gente para ${match.home_name ?? home} × ${match.away_name ?? away}.`;
+
+  return {
+    title,
+    description,
+    openGraph: { title, description },
+    twitter: { title, description },
+  };
+}
 
 export default async function JogoPage({
   params,

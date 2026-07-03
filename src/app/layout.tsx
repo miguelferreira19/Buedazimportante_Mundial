@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Outfit } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import { getSession } from "@/lib/session";
@@ -78,6 +79,12 @@ export default async function RootLayout({
             <p className="text-xs text-faint">
               Feito entre amigos. Resultados pelos 90 minutos.
             </p>
+            <Link
+              href="/regras"
+              className="text-xs text-muted hover:text-fg transition-colors"
+            >
+              Regras
+            </Link>
           </div>
         </footer>
       </body>

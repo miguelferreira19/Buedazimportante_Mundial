@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { getDb } from "./db";
 import { SCORING } from "./scoring";
 import type { DbMatch, DbPrediction, LeaderboardRow } from "./types";
@@ -65,17 +66,17 @@ export async function getLeaderboard(): Promise<LeaderboardRow[]> {
   return rows;
 }
 
-export async function getUserByUsername(
-  username: string,
-): Promise<{ id: string; username: string } | null> {
-  const db = getDb();
-  const { data } = await db
-    .from("users")
-    .select("id, username")
-    .ilike("username", username)
-    .maybeSingle();
-  return data ?? null;
-}
+export const getUserByUsername = cache(
+  async (username: string): Promise<{ id: string; username: string } | null> => {
+    const db = getDb();
+    const { data } = await db
+      .from("users")
+      .select("id, username")
+      .ilike("username", username)
+      .maybeSingle();
+    return data ?? null;
+  },
+);
 
 export async function countUsers(): Promise<number> {
   const db = getDb();
@@ -117,7 +118,8 @@ export async function getUserHistory(
   return rows;
 }
 
-export async function getMatchById(id: number): Promise<DbMatch | null> {
+// cache(): reutiliza o resultado entre generateMetadata e a página (mesmo pedido).
+export const getMatchById = cache(async (id: number): Promise<DbMatch | null> => {
   const db = getDb();
   const { data } = await db
     .from("matches")
@@ -125,7 +127,7 @@ export async function getMatchById(id: number): Promise<DbMatch | null> {
     .eq("id", id)
     .maybeSingle();
   return (data as DbMatch) ?? null;
-}
+});
 
 export type MatchVote = {
   username: string;

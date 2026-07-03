@@ -224,7 +224,7 @@ export default function PalpitesClient({
               }`}
             >
               {fmtDayLabel(list[0].kickoff_utc)}
-              {k === todayKey && <span className="chip">Hoje</span>}
+              {k === todayKey && <span className="chip chip-today">Hoje</span>}
             </h2>
           </div>
 

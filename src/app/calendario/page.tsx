@@ -118,7 +118,7 @@ export default async function CalendarioPage() {
                   }`}
                 >
                   {fmtDayLabel(list[0].kickoff_utc)}
-                  {k === todayK && <span className="chip">Hoje</span>}
+                  {k === todayK && <span className="chip chip-today">Hoje</span>}
                 </h2>
               </div>
               <div className="space-y-2.5">

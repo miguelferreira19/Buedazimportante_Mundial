@@ -673,8 +673,23 @@ body::before {
   white-space: nowrap;
   animation: railSlide 40s linear infinite;
 }
-.rail:hover {
+.rail:hover,
+.rail:focus-within {
   animation-play-state: paused;
+}
+
+/* Chip "Hoje": pulso muito lento, vida sem ruído. */
+.chip-today {
+  animation: chipTodayPulse 3s ease-in-out infinite;
+}
+@keyframes chipTodayPulse {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* Indicador "a decorrer": ponto que pulsa */
@@ -840,8 +855,12 @@ body::before {
     transition: none;
   }
   .login-hero-photo,
-  .site-header-inner {
+  .site-header-inner,
+  .chip-today {
     animation: none;
+  }
+  .chip-today {
+    opacity: 1;
   }
   .lift:hover {
     transform: none;

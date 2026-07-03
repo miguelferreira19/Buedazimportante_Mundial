@@ -96,7 +96,7 @@ export default async function JogoPage({
                 style={{ width: `${awayPct}%` }}
               />
             </div>
-            <div className="grid grid-cols-3 text-[0.68rem] text-faint">
+            <div className="grid grid-cols-3 text-[0.68rem] text-faint tabular-nums">
               <span className="flex items-center gap-1.5">
                 <span aria-hidden className="h-2 w-2 rounded-full bg-brand shrink-0" />
                 Casa {homePct}%

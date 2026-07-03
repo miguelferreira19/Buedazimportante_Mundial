@@ -12,6 +12,14 @@ import { TIER_LABEL, TIER_CLASS } from "@/lib/tiers";
 
 export const dynamic = "force-dynamic";
 
+// Cor de fundo de cada tier na faixa "Forma" (mesma semântica de TIER_CLASS).
+const TIER_BG: Record<ScoreTier, string> = {
+  exact: "bg-good",
+  oneTeam: "bg-cyan",
+  outcome: "bg-gold",
+  miss: "bg-line",
+};
+
 export default async function PerfilPage({
   params,
 }: {
@@ -40,10 +48,31 @@ export default async function PerfilPage({
   const exatos = rows.filter((r) => r.points === SCORING.exact).length;
   const jogados = rows.filter((r) => r.points != null).length;
 
+  // Jogos pontuados, em ordem cronológica (mais antigo -> mais recente).
+  const scored = rows
+    .filter((r) => r.points != null)
+    .sort((a, b) => (a.match.kickoff_utc < b.match.kickoff_utc ? -1 : 1));
+
+  // Melhor série de jogos consecutivos a somar pontos (>0).
+  let bestStreak = 0;
+  let streak = 0;
+  for (const r of scored) {
+    if ((r.points ?? 0) > 0) {
+      streak += 1;
+      bestStreak = Math.max(bestStreak, streak);
+    } else {
+      streak = 0;
+    }
+  }
+
+  // Forma recente: últimos 8 jogos pontuados, mais antigo à esquerda.
+  const last8 = scored.slice(-8);
+
   const stats = [
     { label: "Pontos", value: totalPts, cls: "text-fg" },
     { label: "Exatos", value: exatos, cls: "text-good" },
     { label: "Jogos", value: jogados, cls: "text-fg" },
+    { label: "Melhor série", value: bestStreak, cls: "text-fg" },
   ];
 
   return (
@@ -59,7 +88,7 @@ export default async function PerfilPage({
             <h1 className="h-section truncate">{target.username}</h1>
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-2.5 mt-5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-5">
           {stats.map((s) => (
             <div
               key={s.label}
@@ -74,6 +103,34 @@ export default async function PerfilPage({
             </div>
           ))}
         </div>
+
+        {last8.length > 0 && (
+          <div className="mt-5 pt-4 border-t border-line/60">
+            <p className="text-[0.66rem] text-faint uppercase tracking-wider mb-2">
+              Forma · últimos {last8.length}
+            </p>
+            <div className="flex items-center gap-1.5">
+              {last8.map((r) => {
+                const m = r.match;
+                const tier = scoreTier(
+                  { home: r.pred_home, away: r.pred_away },
+                  { home: m.home_score!, away: m.away_score! },
+                );
+                const label = `${m.home_code ?? m.home_name ?? "?"} ${r.pred_home}×${r.pred_away} ${
+                  m.away_code ?? m.away_name ?? "?"
+                } — +${r.points} pts`;
+                return (
+                  <span
+                    key={m.id}
+                    title={label}
+                    aria-label={label}
+                    className={`h-2.5 w-2.5 rounded-[2px] ${TIER_BG[tier]}`}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {rows.length === 0 ? (

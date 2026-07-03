@@ -317,6 +317,12 @@ body::before {
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 24%, transparent);
     transform: translateY(-1px);
   }
+  /* Variante maior: usada só no cartão "próximo jogo" em destaque. */
+  .score-input-lg {
+    width: 3.6rem;
+    height: 3.6rem;
+    font-size: 1.85rem;
+  }
 
   /* Chip / etiqueta -------------------------------------------------- */
   .chip {
@@ -528,6 +534,23 @@ body::before {
   color: var(--color-faint);
   background: color-mix(in srgb, var(--color-ink2) 85%, transparent);
   border: 1px solid var(--color-line);
+}
+
+/* Cartão "próximo jogo": wash radial laranja muito ténue por trás do conteúdo. */
+.hero-card {
+  overflow: hidden;
+}
+.hero-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 90% at 12% 0%,
+    color-mix(in srgb, var(--color-brand) 12%, transparent),
+    transparent 62%
+  );
 }
 
 /* Pódio da classificação (top 3) */

@@ -94,6 +94,23 @@ export default function PalpitesClient({
     return up[0] ?? null;
   }, [matches, now]);
 
+  // Jogo aberto mais proximo ainda sem palpite: ganha o tratamento hero-card.
+  const heroMatchId = useMemo(() => {
+    for (const [, list] of upcoming) {
+      for (const m of list) {
+        if (
+          !hasStarted(m.kickoff_utc, now) &&
+          m.home_name &&
+          m.away_name &&
+          !saved[m.id]
+        ) {
+          return m.id;
+        }
+      }
+    }
+    return null;
+  }, [upcoming, now, saved]);
+
   function setField(id: number, side: "home" | "away", val: string) {
     const v = val.replace(/[^0-9]/g, "").slice(0, 2);
     setPreds((p) => ({
@@ -219,6 +236,7 @@ export default function PalpitesClient({
               const sv = saved[m.id];
               const st = state[m.id] ?? "idle";
               const open = !started && teamsKnown;
+              const isHero = m.id === heroMatchId;
 
               let tier: ScoreTier | null = null;
               if (finished && sv && m.home_score != null && m.away_score != null) {
@@ -232,12 +250,17 @@ export default function PalpitesClient({
                 <div
                   key={m.id}
                   className={`card lift p-3.5 ${
-                    open && !sv
-                      ? "border-brand/25"
-                      : ""
+                    isHero
+                      ? "hero-card border-brand/50"
+                      : open && !sv
+                        ? "border-brand/25"
+                        : ""
                   }`}
                 >
-                  <div className="flex items-center justify-between text-xs text-faint mb-2.5">
+                  {isHero && (
+                    <p className="eyebrow relative z-10 mb-2">O próximo jogo</p>
+                  )}
+                  <div className="flex items-center justify-between text-xs text-faint mb-2.5 relative z-10">
                     <span className="truncate font-medium uppercase tracking-wide">
                       {m.grp ?? m.stage ?? ""}
                       {m.matchday && m.grp ? ` · J${m.matchday}` : ""}
@@ -254,7 +277,7 @@ export default function PalpitesClient({
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2.5">
+                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2.5 relative z-10">
                     {/* Casa */}
                     <div className="flex items-center gap-2.5 min-w-0 justify-end text-right">
                       <TeamName
@@ -262,7 +285,11 @@ export default function PalpitesClient({
                         code={m.home_code}
                         className="font-semibold"
                       />
-                      <Crest src={m.home_crest} alt={m.home_name ?? ""} size={28} />
+                      <Crest
+                        src={m.home_crest}
+                        alt={m.home_name ?? ""}
+                        size={isHero ? 36 : 28}
+                      />
                     </div>
 
                     {/* Centro: inputs ou resultado */}
@@ -270,7 +297,7 @@ export default function PalpitesClient({
                       {open ? (
                         <>
                           <input
-                            className="score-input"
+                            className={`score-input ${isHero ? "score-input-lg" : ""}`}
                             inputMode="numeric"
                             value={p?.home ?? ""}
                             onChange={(e) =>
@@ -280,7 +307,7 @@ export default function PalpitesClient({
                           />
                           <span className="text-faint text-sm">×</span>
                           <input
-                            className="score-input"
+                            className={`score-input ${isHero ? "score-input-lg" : ""}`}
                             inputMode="numeric"
                             value={p?.away ?? ""}
                             onChange={(e) =>
@@ -322,7 +349,11 @@ export default function PalpitesClient({
 
                     {/* Fora */}
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <Crest src={m.away_crest} alt={m.away_name ?? ""} size={28} />
+                      <Crest
+                        src={m.away_crest}
+                        alt={m.away_name ?? ""}
+                        size={isHero ? 36 : 28}
+                      />
                       <TeamName
                         name={m.away_name}
                         code={m.away_code}
@@ -332,11 +363,13 @@ export default function PalpitesClient({
                   </div>
 
                   {/* Rodapé: guardar OU palpite/resultado */}
-                  <div className="mt-2.5 pt-2.5 border-t border-line/50 flex items-center justify-between gap-2 min-h-[2.25rem]">
+                  <div className="mt-2.5 pt-2.5 border-t border-line/50 flex items-center justify-between gap-2 min-h-[2.25rem] relative z-10">
                     {open ? (
                       <>
                         <span className="text-xs text-faint">
-                          {countdown(m.kickoff_utc, now)}
+                          <span className={isHero ? "display text-sm text-fg" : ""}>
+                            {countdown(m.kickoff_utc, now)}
+                          </span>
                           {st === "saved" && !isDirty(m.id) && (
                             <span className="text-good ml-2 saved-flash font-semibold">
                               ✓ guardado

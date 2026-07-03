@@ -683,6 +683,35 @@ body::before {
   }
 }
 
+/* Cartão: flash de borda/sombra verde a desvanecer, ao guardar. */
+.card-saved-flash {
+  border-color: color-mix(in srgb, var(--color-good) 55%, var(--color-line));
+  animation: cardSavedFlash 0.9s var(--ease-out) forwards;
+}
+@keyframes cardSavedFlash {
+  0% {
+    border-color: color-mix(in srgb, var(--color-good) 75%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-good) 22%, transparent),
+      var(--shadow-md);
+  }
+  100% {
+    border-color: var(--color-line);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+/* Botão guardar: check desenhado (o traço aparece a "desenhar-se"). */
+.check-draw path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: checkDraw 0.35s var(--ease-out) forwards;
+}
+@keyframes checkDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 /* Revelar ao scroll (IntersectionObserver põe .is-visible) */
 .reveal {
   opacity: 0;
@@ -712,11 +741,16 @@ body::before {
   .rail,
   .saved-flash,
   .skeleton,
-  .podium-rise {
+  .podium-rise,
+  .card-saved-flash,
+  .check-draw path {
     animation: none;
   }
   .podium-rise {
     opacity: 1;
+  }
+  .check-draw path {
+    stroke-dashoffset: 0;
   }
   .reveal {
     opacity: 1;

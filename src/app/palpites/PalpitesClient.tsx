@@ -250,11 +250,13 @@ export default function PalpitesClient({
                 <div
                   key={m.id}
                   className={`card lift p-3.5 ${
-                    isHero
-                      ? "hero-card border-brand/50"
-                      : open && !sv
-                        ? "border-brand/25"
-                        : ""
+                    st === "saved" && !isDirty(m.id)
+                      ? "card-saved-flash"
+                      : isHero
+                        ? "hero-card border-brand/50"
+                        : open && !sv
+                          ? "border-brand/25"
+                          : ""
                   }`}
                 >
                   {isHero && (
@@ -384,11 +386,18 @@ export default function PalpitesClient({
                           disabled={st === "saving" || !isDirty(m.id)}
                           onClick={() => save(m.id)}
                         >
-                          {st === "saving"
-                            ? "A guardar…"
-                            : isDirty(m.id)
-                              ? "Guardar"
-                              : "Guardado"}
+                          {st === "saving" ? (
+                            "A guardar…"
+                          ) : isDirty(m.id) ? (
+                            "Guardar"
+                          ) : st === "saved" ? (
+                            <span className="inline-flex items-center gap-1.5">
+                              <CheckDraw />
+                              Guardado
+                            </span>
+                          ) : (
+                            "Guardado"
+                          )}
                         </button>
                       </>
                     ) : (
@@ -489,6 +498,26 @@ function Hero({
         )}
       </div>
     </header>
+  );
+}
+
+// Check desenhado (stroke-dashoffset) ao guardar um palpite. Sem confetti, sem libs.
+function CheckDraw() {
+  return (
+    <svg
+      aria-hidden="true"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="check-draw"
+    >
+      <path d="M4 12.5l5 5L20 6" />
+    </svg>
   );
 }
 

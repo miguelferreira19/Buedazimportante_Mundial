@@ -40,7 +40,7 @@ export default async function ClassificacaoPage() {
         <>
           {/* Pódio: os 3 primeiros, com o líder em destaque */}
           <Reveal>
-            <div className="podium relative p-4 sm:p-5">
+            <div className="podium relative p-4 sm:p-6">
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-cover bg-center opacity-[0.14]"
@@ -51,7 +51,9 @@ export default async function ClassificacaoPage() {
                   maskImage: "linear-gradient(90deg, transparent, #000 75%)",
                 }}
               />
-              <ul className="relative z-10 space-y-2.5">
+
+              {/* Mobile: lista vertical (o pódio de 3 colunas não cabe bem em ecrãs estreitos) */}
+              <ul className="relative z-10 sm:hidden space-y-2.5">
                 {top.map((r, i) => {
                   const me = isMe(r.username);
                   const lead = i === 0;
@@ -103,6 +105,72 @@ export default async function ClassificacaoPage() {
                   );
                 })}
               </ul>
+
+              {/* Desktop/tablet: pódio real de 3 colunas (2.º | 1.º | 3.º) */}
+              <div className="relative z-10 hidden sm:grid grid-cols-3 items-end gap-4">
+                {top.map((r, i) => {
+                  const rank = i + 1;
+                  const me = isMe(r.username);
+                  const col = rank === 1 ? 2 : rank === 2 ? 1 : 3;
+                  const riseDelay = rank === 2 ? 0 : rank === 3 ? 120 : 260;
+                  return (
+                    <div
+                      key={r.username}
+                      style={{ gridColumn: col }}
+                      className="flex flex-col items-center text-center"
+                    >
+                      {rank === 1 && (
+                        <LaurelWreath className="text-gold mb-1.5" size={34} />
+                      )}
+                      <Link
+                        href={`/perfil/${r.username}`}
+                        className="group flex flex-col items-center gap-1.5"
+                      >
+                        <span
+                          aria-hidden
+                          className={`avatar ${
+                            rank === 1
+                              ? "h-16 w-16 text-2xl ring-2 ring-gold/60"
+                              : "h-12 w-12 text-lg"
+                          } ${me ? "ring-2 ring-brand/60" : ""}`}
+                        >
+                          {r.username.charAt(0)}
+                        </span>
+                        <span
+                          className={`font-bold truncate max-w-[8rem] group-hover:text-brand transition-colors ${
+                            rank === 1 ? "text-base" : "text-sm"
+                          }`}
+                        >
+                          {r.username}
+                        </span>
+                      </Link>
+                      {me && (
+                        <span className="text-[0.62rem] text-muted font-medium -mt-1">
+                          (tu)
+                        </span>
+                      )}
+                      <div
+                        className={`display text-fg mt-1 ${
+                          rank === 1 ? "text-3xl" : "text-xl"
+                        }`}
+                      >
+                        <CountUp value={r.points} />
+                      </div>
+                      <div className="text-[0.6rem] text-faint uppercase tracking-wider mb-2.5">
+                        pts
+                      </div>
+                      <div
+                        className={`podium-step podium-rise rank-${rank} w-full rounded-t-xl flex items-start justify-center pt-2.5 ${
+                          rank === 1 ? "min-h-44" : rank === 2 ? "min-h-36" : "min-h-32"
+                        }`}
+                        style={{ animationDelay: `${riseDelay}ms` }}
+                      >
+                        <span className="display text-2xl">{rank}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </Reveal>
 
@@ -154,5 +222,38 @@ export default async function ClassificacaoPage() {
         </>
       )}
     </div>
+  );
+}
+
+// Coroa de louros desenhada (sem emoji), só para o 1.º lugar do pódio.
+function LaurelWreath({
+  size = 32,
+  className = "",
+}: {
+  size?: number;
+  className?: string;
+}) {
+  const leaves =
+    "M4 24l6-2.6M3.2 18.6l6-1.8M3.4 13l6-1.1M4.8 7.7l5.8.2M8 3.2l5.2 1.9";
+  return (
+    <svg
+      aria-hidden="true"
+      width={size}
+      height={size * 0.62}
+      viewBox="0 0 44 26"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M3 22C3 12 10 3 20 2" />
+      <path d={leaves} />
+      <g transform="translate(44,0) scale(-1,1)">
+        <path d="M3 22C3 12 10 3 20 2" />
+        <path d={leaves} />
+      </g>
+    </svg>
   );
 }

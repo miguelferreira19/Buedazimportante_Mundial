@@ -544,6 +544,27 @@ body::before {
   box-shadow: 0 20px 50px -30px rgba(242, 193, 78, 0.6);
 }
 
+/* Colunas do pódio (desktop/tablet): base metálica + número, altura por rank
+   definida inline via min-h-* no JSX. */
+.podium-step {
+  position: relative;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+.podium-rise {
+  opacity: 0;
+  animation: podiumRise 0.55s var(--ease-out) forwards;
+}
+@keyframes podiumRise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Carrossel infinito de seleções ("ambiente Mundial") */
 .rail-mask {
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
@@ -667,8 +688,12 @@ body::before {
   .live-dot,
   .rail,
   .saved-flash,
-  .skeleton {
+  .skeleton,
+  .podium-rise {
     animation: none;
+  }
+  .podium-rise {
+    opacity: 1;
   }
   .reveal {
     opacity: 1;

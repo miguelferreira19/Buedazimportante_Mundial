@@ -47,7 +47,7 @@ export default function LoginForm() {
           z-0 (a frente do fundo opaco do body), conteudo fica em z-10. */}
       <div aria-hidden className="fixed inset-0 z-0 overflow-hidden">
         <div
-          className="photo photo-wash"
+          className="photo photo-wash login-hero-photo"
           style={{ "--img": "url(/img/hero-stadium.jpg)" } as React.CSSProperties}
         />
       </div>

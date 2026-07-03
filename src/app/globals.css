@@ -452,6 +452,23 @@ body::before {
   transform: scale(1.08);
 }
 
+/* Parallax subtil da foto do login: desloca 8px com o scroll da página.
+   Sem suporte a scroll-timeline (Safari < 26 etc.), fica sem efeito. */
+@supports (animation-timeline: scroll()) {
+  .login-hero-photo {
+    animation: loginParallax linear both;
+    animation-timeline: scroll(root);
+  }
+}
+@keyframes loginParallax {
+  from {
+    transform: translateY(0) scale(1.04);
+  }
+  to {
+    transform: translateY(8px) scale(1.04);
+  }
+}
+
 /* Banda fotográfica (cabeçalho de página) */
 .photo-band {
   position: relative;
@@ -464,11 +481,23 @@ body::before {
 
 /* Vidro (form de login sobre a foto) */
 .glass {
+  position: relative;
+  overflow: hidden;
   background: color-mix(in srgb, var(--color-card) 72%, transparent);
   border: 1px solid color-mix(in srgb, #ffffff 12%, var(--color-line));
   border-radius: var(--radius-xl);
   backdrop-filter: blur(22px) saturate(1.2);
   box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.06) inset, var(--shadow-lg);
+}
+/* Hairline superior com o gradiente festivo. */
+.glass::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--grad-festive);
 }
 
 /* Faixa fina warm no topo (substitui o arco-íris carnavalesco) */
@@ -775,6 +804,9 @@ body::before {
   .photo {
     transform: none;
     transition: none;
+  }
+  .login-hero-photo {
+    animation: none;
   }
   .lift:hover {
     transform: none;

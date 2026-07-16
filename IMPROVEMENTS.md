@@ -32,11 +32,11 @@ o hash do commit. Pode também acrescentar ideias novas que descubra pelo caminh
 
 ## Em curso
 
-- [ ] Testes para `src/lib/tiers.ts` e `src/lib/format.ts` (test-writer, iteração 1)
+_(vazio)_
 
 ## Feito
 
-_(vazio)_
+- [x] 2026-07-16 (it. 1, test-writer): Testes para `tiers.ts` (6) e `format.ts` (21) — total agora 36 testes; script `test` corre os 3 ficheiros; corrigido comentário enganoso do `countdown` em `format.ts`. Reviewer: APROVAR (verificado determinismo em 3 fusos horários).
 
 ## Notas entre iterações
 

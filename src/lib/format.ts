@@ -51,7 +51,7 @@ export function hasStarted(iso: string, now: number = Date.now()): boolean {
   return now >= new Date(iso).getTime();
 }
 
-// Contagem decrescente legivel ("2d 4h", "3h 12m", "8m", "a começar")
+// Contagem decrescente legivel ("faltam 2d 4h", "faltam 3h 12m", "faltam 8m", "fechado")
 export function countdown(iso: string, now: number = Date.now()): string {
   const ms = new Date(iso).getTime() - now;
   if (ms <= 0) return "fechado";

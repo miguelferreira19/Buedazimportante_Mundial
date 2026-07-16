@@ -10,7 +10,6 @@ o hash do commit. Pode também acrescentar ideias novas que descubra pelo caminh
 ### Visual / UX (agente: designer)
 - [ ] Rever a homepage: hierarquia do herói, chamada para ação mais clara para quem ainda não tem conta
 - [ ] Melhorar estados vazios (sem palpites, sem jogos no dia) com ilustração/mensagem simpática
-- [ ] Polir a página de classificação em mobile (tabela estreita, nomes longos)
 - [ ] Dark mode consistente em todas as páginas (se já existir parcialmente, uniformizar)
 - [ ] Feedback visual ao gravar um palpite (toast/confirmação subtil)
 
@@ -36,6 +35,7 @@ _(vazio)_
 
 ## Feito
 
+- [x] 2026-07-16 (it. 2, designer): Classificação em mobile — truncagem de nomes longos a funcionar de facto (`min-w-0` em falta nos flex items do pódio e da lista), linha de stats em `block truncate`, touch targets ≥44px na lista (`py-3` mobile). Reviewer: APROVAR sem correções.
 - [x] 2026-07-16 (it. 1, test-writer): Testes para `tiers.ts` (6) e `format.ts` (21) — total agora 36 testes; script `test` corre os 3 ficheiros; corrigido comentário enganoso do `countdown` em `format.ts`. Reviewer: APROVAR (verificado determinismo em 3 fusos horários).
 
 ## Notas entre iterações

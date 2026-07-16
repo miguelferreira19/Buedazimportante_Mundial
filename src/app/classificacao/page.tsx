@@ -79,9 +79,9 @@ export default async function ClassificacaoPage() {
                         className="min-w-0 flex-1 hover:text-brand transition-colors"
                       >
                         <span
-                          className={`flex items-center gap-1.5 ${lead ? "text-lg" : ""}`}
+                          className={`flex items-center gap-1.5 min-w-0 ${lead ? "text-lg" : ""}`}
                         >
-                          <span className="font-bold truncate">
+                          <span className="font-bold truncate min-w-0">
                             {r.username}
                             {me && (
                               <span className="text-xs text-muted font-normal ml-1">
@@ -91,7 +91,7 @@ export default async function ClassificacaoPage() {
                           </span>
                           <RankDelta username={r.username} rank={i + 1} />
                         </span>
-                        <span className="text-[0.7rem] text-faint">
+                        <span className="block truncate text-[0.7rem] text-faint">
                           {r.exactos} exatos · {r.jogados} jogos
                         </span>
                       </Link>
@@ -196,7 +196,7 @@ export default async function ClassificacaoPage() {
                   return (
                     <li
                       key={r.username}
-                      className={`grid grid-cols-[2.5rem_1fr_auto] sm:grid-cols-[2.5rem_1fr_4rem_4rem] gap-3 items-center px-4 py-2.5 transition-colors ${
+                      className={`grid grid-cols-[2.5rem_1fr_auto] sm:grid-cols-[2.5rem_1fr_4rem_4rem] gap-3 items-center px-4 py-3 sm:py-2.5 transition-colors ${
                         me ? "bg-brand/[0.08]" : "hover:bg-card2/40"
                       }`}
                     >
@@ -206,7 +206,7 @@ export default async function ClassificacaoPage() {
                       <span className="flex items-center gap-1.5 min-w-0">
                         <Link
                           href={`/perfil/${r.username}`}
-                          className="hover:text-brand font-semibold truncate transition-colors"
+                          className="hover:text-brand font-semibold truncate min-w-0 transition-colors"
                         >
                           {r.username}
                           {me && (

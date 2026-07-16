@@ -2,8 +2,11 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { isDbConfigured } from "@/lib/db";
-import { getLeaderboard } from "@/lib/queries";
+import { getLeaderboard, getFinalStageMatches } from "@/lib/queries";
+import { tournamentFinished } from "@/lib/tournament";
+import { PRIZES } from "@/lib/prizes";
 import SetupNotice from "@/components/SetupNotice";
+import PrizeBanner from "@/components/PrizeBanner";
 import CountUp from "@/components/CountUp";
 import Reveal from "@/components/Reveal";
 import RankDelta from "@/components/RankDelta";
@@ -15,10 +18,22 @@ export default async function ClassificacaoPage() {
   if (!user) redirect("/login");
   if (!isDbConfigured()) return <SetupNotice />;
 
-  const rows = await getLeaderboard();
+  const [rows, finalMatches] = await Promise.all([
+    getLeaderboard(),
+    getFinalStageMatches(),
+  ]);
   const top = rows.slice(0, 3);
   const rest = rows.slice(3);
   const isMe = (u: string) => u.toLowerCase() === user.username.toLowerCase();
+
+  // Surpresa de prémios: só quando o Mundial termina E há pelo menos 2 jogadores
+  // (com 1 jogador seria campeão e último ao mesmo tempo). Até lá, nada aparece.
+  const showPrizes = tournamentFinished(finalMatches) && rows.length >= 2;
+  const championName = showPrizes ? rows[0].username : null;
+  const loserName = showPrizes ? rows[rows.length - 1].username : null;
+  // O último está no pódio (top 3) quando há 3 ou menos jogadores.
+  const loserInPodium = showPrizes && rows.length <= 3;
+  const isLoser = (u: string) => showPrizes && u === loserName;
 
   return (
     <div className="space-y-6">
@@ -39,6 +54,11 @@ export default async function ClassificacaoPage() {
         </div>
       ) : (
         <>
+          {/* Surpresa: bloco festivo no topo quando o Mundial termina */}
+          {showPrizes && championName && loserName && (
+            <PrizeBanner champion={championName} loser={loserName} />
+          )}
+
           {/* Pódio: os 3 primeiros, com o líder em destaque */}
           <Reveal>
             <div className="podium relative p-4 sm:p-6">
@@ -178,6 +198,15 @@ export default async function ClassificacaoPage() {
                   );
                 })}
               </div>
+
+              {/* Prémios no pódio: campeão sempre; último só se estiver no top 3.
+                  Uma só faixa, partilhada por mobile e desktop. */}
+              {showPrizes && (
+                <div className="relative z-10 mt-4 flex flex-wrap items-center justify-center gap-2 border-t border-line/50 pt-4">
+                  <ChampionPill />
+                  {loserInPodium && <LoserPill />}
+                </div>
+              )}
             </div>
           </Reveal>
 
@@ -193,29 +222,37 @@ export default async function ClassificacaoPage() {
               <ul className="divide-y divide-line/40">
                 {rest.map((r, i) => {
                   const me = isMe(r.username);
+                  const loser = isLoser(r.username);
                   return (
                     <li
                       key={r.username}
                       className={`grid grid-cols-[2.5rem_1fr_auto] sm:grid-cols-[2.5rem_1fr_4rem_4rem] gap-3 items-center px-4 py-3 sm:py-2.5 transition-colors ${
-                        me ? "bg-brand/[0.08]" : "hover:bg-card2/40"
+                        loser
+                          ? "bg-card2/60"
+                          : me
+                            ? "bg-brand/[0.08]"
+                            : "hover:bg-card2/40"
                       }`}
                     >
                       <span className="display text-muted tabular-nums">
                         {i + 4}
                       </span>
-                      <span className="flex items-center gap-1.5 min-w-0">
-                        <Link
-                          href={`/perfil/${r.username}`}
-                          className="hover:text-brand font-semibold truncate min-w-0 transition-colors"
-                        >
-                          {r.username}
-                          {me && (
-                            <span className="text-xs text-muted font-normal ml-1">
-                              (tu)
-                            </span>
-                          )}
-                        </Link>
-                        <RankDelta username={r.username} rank={i + 4} />
+                      <span className="flex flex-col gap-1.5 min-w-0">
+                        <span className="flex items-center gap-1.5 min-w-0">
+                          <Link
+                            href={`/perfil/${r.username}`}
+                            className="hover:text-brand font-semibold truncate min-w-0 transition-colors"
+                          >
+                            {r.username}
+                            {me && (
+                              <span className="text-xs text-muted font-normal ml-1">
+                                (tu)
+                              </span>
+                            )}
+                          </Link>
+                          <RankDelta username={r.username} rank={i + 4} />
+                        </span>
+                        {loser && <LoserPill className="self-start" />}
                       </span>
                       <span className="text-right text-muted tabular-nums hidden sm:block">
                         {r.exactos}
@@ -232,6 +269,29 @@ export default async function ClassificacaoPage() {
         </>
       )}
     </div>
+  );
+}
+
+// Etiquetas curtas de prémio (emoji decorativo com aria-hidden; texto acessível).
+function ChampionPill({ className = "" }: { className?: string }) {
+  return (
+    <span
+      className={`chip border-gold/50 bg-gold/10 text-gold whitespace-normal ${className}`}
+    >
+      <span aria-hidden>{PRIZES.champion.badgeEmoji}</span>
+      {PRIZES.champion.badge}
+    </span>
+  );
+}
+
+function LoserPill({ className = "" }: { className?: string }) {
+  return (
+    <span
+      className={`chip border-line2 bg-card2/70 text-muted whitespace-normal ${className}`}
+    >
+      <span aria-hidden>{PRIZES.loser.badgeEmoji}</span>
+      {PRIZES.loser.badge}
+    </span>
   );
 }
 

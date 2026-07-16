@@ -35,6 +35,7 @@ _(vazio)_
 
 ## Feito
 
+- [x] 2026-07-16 (pedido direto, feature-dev): 🏆 Surpresa de prémios no fim do torneio — quando a final tem resultado, a classificação revela banner festivo + prémios: 1º ganha jantar pago pelo último, último paga o jantar. Deteção via `tournamentFinished()` (só `stage="Final"` com `status="finished"`; 3º/4º lugar ignorado), 11 testes novos, a11y e reduced-motion tratados. Reviewer: APROVAR sem correções.
 - [x] 2026-07-16 (it. 2, designer): Classificação em mobile — truncagem de nomes longos a funcionar de facto (`min-w-0` em falta nos flex items do pódio e da lista), linha de stats em `block truncate`, touch targets ≥44px na lista (`py-3` mobile). Reviewer: APROVAR sem correções.
 - [x] 2026-07-16 (it. 1, test-writer): Testes para `tiers.ts` (6) e `format.ts` (21) — total agora 36 testes; script `test` corre os 3 ficheiros; corrigido comentário enganoso do `countdown` em `format.ts`. Reviewer: APROVAR (verificado determinismo em 3 fusos horários).
 

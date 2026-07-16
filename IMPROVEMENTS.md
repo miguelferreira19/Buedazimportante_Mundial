@@ -41,4 +41,6 @@ _(vazio)_
 
 ## Notas entre iterações
 
+- 2026-07-16: o webhook GitHub→Vercel deixou de disparar depois do deploy do commit `6c3da0e` (it. 2). Os commits `89bb11f` (feature dos prémios) e `26286c2` (empty commit de nudge) estão no GitHub mas SEM deployment no Vercel. **Próxima iteração: no passo 7, confirmar que o deployment mais recente já inclui estes commits; se o webhook continuar em baixo, avisar o utilizador para fazer "Redeploy" manual no dashboard do Vercel.**
+
 _(o orquestrador pode deixar aqui contexto útil para a iteração seguinte)_

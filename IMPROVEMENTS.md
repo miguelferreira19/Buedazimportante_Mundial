@@ -21,7 +21,6 @@ o hash do commit. Pode também acrescentar ideias novas que descubra pelo caminh
 - [ ] Badge/selo para o líder da semana na classificação
 
 ### Testes & robustez (agente: test-writer)
-- [ ] Testes para `src/lib/tiers.ts` e `src/lib/format.ts`
 - [ ] Testes para a lógica de fecho de palpites (jogo começado ⇒ palpite bloqueado)
 - [ ] Testes de validação zod das API routes (payloads inválidos)
 
@@ -33,7 +32,7 @@ o hash do commit. Pode também acrescentar ideias novas que descubra pelo caminh
 
 ## Em curso
 
-_(vazio)_
+- [ ] Testes para `src/lib/tiers.ts` e `src/lib/format.ts` (test-writer, iteração 1)
 
 ## Feito
 

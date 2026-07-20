@@ -17,6 +17,9 @@ export type DbMatch = {
   home_score: number | null;
   away_score: number | null;
   status: MatchStatus;
+  // Resultado inserido a mao pelo admin; protegido da sincronizacao automatica.
+  // Opcional: pode nao vir se a coluna ainda nao existir na BD.
+  manual_result?: boolean;
   updated_at: string;
 };
 

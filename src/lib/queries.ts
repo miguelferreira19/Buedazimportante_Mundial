@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { getDb } from "./db";
 import { SCORING } from "./scoring";
+import { FINAL_STAGE } from "./tournament";
 import type { DbMatch, DbPrediction, LeaderboardRow } from "./types";
 
 export async function getAllMatches(): Promise<DbMatch[]> {
@@ -12,6 +13,20 @@ export async function getAllMatches(): Promise<DbMatch[]> {
     .order("kickoff_utc", { ascending: true })
     .order("id", { ascending: true });
   return (data ?? []) as DbMatch[];
+}
+
+// Leve: so as linhas da fase Final (stage + status). Serve para saber se o
+// torneio terminou sem carregar todos os jogos. Passa o resultado ao helper
+// puro tournamentFinished(). Ha no maximo 1 jogo com stage "Final".
+export async function getFinalStageMatches(): Promise<
+  Pick<DbMatch, "stage" | "status">[]
+> {
+  const db = getDb();
+  const { data } = await db
+    .from("matches")
+    .select("stage, status")
+    .eq("stage", FINAL_STAGE);
+  return (data ?? []) as Pick<DbMatch, "stage" | "status">[];
 }
 
 export async function getUserPredictions(

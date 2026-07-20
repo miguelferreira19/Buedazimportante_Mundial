@@ -28,6 +28,8 @@ create table if not exists matches (
   home_score int,
   away_score int,
   status text not null default 'scheduled',
+  -- Resultado inserido a mao pelo admin: protegido da sincronizacao automatica.
+  manual_result boolean not null default false,
   updated_at timestamptz not null default now()
 );
 

@@ -227,6 +227,14 @@ export default function AdminClient({
             >
               <div className="text-xs text-muted w-full sm:w-auto sm:flex-1 truncate">
                 {fmtKickoff(m.kickoff_utc)} · {m.grp ?? m.stage ?? ""}
+                {m.manual_result && (
+                  <span
+                    className="chip ml-2 text-gold border-gold/40"
+                    title="Resultado manual: protegido da sincronização automática"
+                  >
+                    manual
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="text-sm w-24 text-right truncate">

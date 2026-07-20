@@ -662,6 +662,70 @@ body::before {
   }
 }
 
+/* Surpresa de prémios (fim do Mundial) — bloco festivo dourado com brilho que
+   varre a superfície. Aro/sombra dourados sobrepõem-se ao .card. */
+.prize-banner {
+  position: relative;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--color-gold) 52%, var(--color-line));
+  box-shadow: 0 24px 60px -34px rgba(242, 193, 78, 0.6), var(--shadow-md);
+}
+.prize-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    130% 90% at 50% -10%,
+    color-mix(in srgb, var(--color-gold) 16%, transparent),
+    transparent 60%
+  );
+}
+/* Faixa de brilho que atravessa o cartão (celebração subtil). */
+.prize-banner::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 42%;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.13) 50%,
+    transparent 80%
+  );
+  transform: translateX(-160%);
+  animation: prizeShine 5s var(--ease-in-out) 0.6s infinite;
+}
+.prize-banner > * {
+  position: relative;
+  z-index: 1;
+}
+@keyframes prizeShine {
+  to {
+    transform: translateX(420%);
+  }
+}
+/* Troféu que faz "pop" ao revelar. */
+.prize-trophy {
+  display: inline-block;
+  animation: prizePop 0.6s var(--ease-spring) both;
+}
+@keyframes prizePop {
+  from {
+    opacity: 0;
+    transform: scale(0.4) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
 /* Carrossel infinito de seleções ("ambiente Mundial") */
 .rail-mask {
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
@@ -832,10 +896,13 @@ body::before {
   .skeleton,
   .podium-rise,
   .card-saved-flash,
-  .check-draw path {
+  .check-draw path,
+  .prize-banner::after,
+  .prize-trophy {
     animation: none;
   }
-  .podium-rise {
+  .podium-rise,
+  .prize-trophy {
     opacity: 1;
   }
   .check-draw path {
